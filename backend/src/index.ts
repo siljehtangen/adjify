@@ -1,0 +1,45 @@
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import roomsRouter from './routes/rooms.js';
+import storiesRouter from './routes/stories.js';
+import chainRouter from './routes/chain.js';
+import battleRouter from './routes/battle.js';
+import { setupSockets } from './services/socketService.js';
+
+const app = express();
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    credentials: true,
+  },
+});
+
+app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3001', credentials: true }));
+app.use(express.json());
+
+// Attach io instance to requests so routes can emit events
+app.use((req: any, _res, next) => {
+  req.io = io;
+  next();
+});
+
+app.get('/health', (_req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+app.use('/api/rooms', roomsRouter);
+app.use('/api/rooms/:code/stories', storiesRouter);
+app.use('/api/rooms/:code/chain', chainRouter);
+app.use('/api/rooms/:code/battle', battleRouter);
+
+setupSockets(io);
+
+const PORT = process.env.PORT || 3000;
+httpServer.listen(PORT, () => {
+  console.log(`Adjify backend running on port ${PORT}`);
+});
+
+export { io };
