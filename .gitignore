@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+backend/dist/
+
+# Env files
+.env
+*.env
+!*.env.example
+
+# Flutter
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/pubspec.lock
+app/lib/config/env.g.dart
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
