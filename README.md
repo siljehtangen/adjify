@@ -24,7 +24,7 @@ Authentication is handled via Google OAuth through Supabase. Rooms are real-time
 | Navigation (app) | GoRouter |
 | Environment config (app) | envied + build_runner |
 
-The majority of the product is Flutter/Dart. TypeScript is used only for the backend server — real-time room management, game state, and auth middleware.
+The app is primarily built in Flutter/Dart, with TypeScript used only for the backend. Node.js was chosen over a pure‑Dart backend due to its mature Socket.io ecosystem, which makes implementing reliable real‑time room and game‑state handling substantially easier. 
 
 ---
 
