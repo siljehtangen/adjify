@@ -5,7 +5,28 @@ function generateRoomCode(): string {
   return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
+async function ensureProfile(hostId: string): Promise<void> {
+  const { data: existing } = await supabase
+    .from('profiles')
+    .select('id')
+    .eq('id', hostId)
+    .single();
+
+  if (existing) return;
+
+  const { data: authUser } = await supabase.auth.admin.getUserById(hostId);
+  const email = authUser?.user?.email ?? '';
+  const username =
+    (authUser?.user?.user_metadata?.name as string | undefined) ??
+    email.split('@')[0] ??
+    'player';
+
+  await supabase.from('profiles').upsert({ id: hostId, username });
+}
+
 export async function createRoom(hostId: string, mode: GameMode, maxPlayers: number): Promise<Room> {
+  await ensureProfile(hostId);
+
   let code = generateRoomCode();
   let attempts = 0;
 
@@ -51,6 +72,7 @@ export async function getRoomByCode(code: string) {
 }
 
 export async function joinRoom(code: string, playerId: string) {
+  await ensureProfile(playerId);
   const room = await getRoomByCode(code);
 
   if (!room) throw new Error('Room not found');
@@ -91,8 +113,8 @@ export async function startGame(roomId: string, hostId: string) {
 
   const minPlayers: Record<string, number> = {
     fill_reveal: 1,
-    rotating_chain: 3,
-    battle: 3,
+    rotating_chain: 2,
+    battle: 2,
   };
 
   if (room.room_players.length < minPlayers[room.mode]) {
