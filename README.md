@@ -98,7 +98,9 @@ npm run dev
 cd app
 flutter pub get
 flutter pub run build_runner build
-flutter run
+
+# Run on web (Edge, port 8080)
+flutter run -d edge --web-port 8080
 ```
 
 ### 4. Database
