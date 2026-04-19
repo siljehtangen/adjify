@@ -6,9 +6,9 @@ import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 
-const _kBg = Color(0xFF060F1E);
-const _kSurface = Color(0xFF0B1D35);
-const _kBorder = Color(0xFF1A3A5C);
+const _kBg = Color(0xFF101D2E);
+const _kSurface = Color(0xFF192C44);
+const _kBorder = Color(0xFF284D6E);
 const _kText = Color(0xFFEBF4FF);
 const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFFFB7185);

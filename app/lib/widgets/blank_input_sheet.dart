@@ -23,7 +23,7 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
     return Container(
       padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0B1D35),
+        color: const Color(0xFF192C44),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.2)),
         boxShadow: [
@@ -71,9 +71,9 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
           const Gap(18),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF060F1E),
+              color: const Color(0xFF101D2E),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF1A3A5C)),
+              border: Border.all(color: const Color(0xFF284D6E)),
             ),
             child: TextField(
               controller: _controller,

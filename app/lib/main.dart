@@ -27,7 +27,7 @@ class AdjifyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF38BDF8),
           brightness: Brightness.dark,
-          surface: const Color(0xFF060F1E),
+          surface: const Color(0xFF101D2E),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,

@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
@@ -8,12 +9,25 @@ import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/blank_input_sheet.dart';
 
-const _kBg = Color(0xFF060F1E);
-const _kSurface = Color(0xFF0B1D35);
-const _kBorder = Color(0xFF1A3A5C);
+const _kBg = Color(0xFF101D2E);
+const _kSurface = Color(0xFF192C44);
+const _kBorder = Color(0xFF284D6E);
 const _kText = Color(0xFFEBF4FF);
 const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFF818CF8);
+
+const _adjectives = [
+  'mysterious', 'fluffy', 'ancient', 'enormous', 'sparkly',
+  'suspicious', 'wobbly', 'magnificent', 'grumpy', 'luminous',
+  'peculiar', 'squishy', 'majestic', 'bewildered', 'colossal',
+  'wiggly', 'glamorous', 'ferocious', 'bouncy', 'ethereal',
+  'crusty', 'vibrant', 'sleepy', 'thunderous', 'invisible',
+  'mushy', 'radiant', 'frantic', 'velvety', 'gigantic',
+  'smelly', 'dazzling', 'whimsical', 'catastrophic', 'soggy',
+  'bubbly', 'ominous', 'tremendous', 'gloopy', 'frilly',
+  'grumbling', 'electric', 'melancholy', 'crispy', 'fuzzy',
+  'shimmering', 'pompous', 'oblivious', 'mischievous', 'wobbly',
+];
 
 class FillRevealScreen extends StatefulWidget {
   final String roomCode;
@@ -26,15 +40,18 @@ class FillRevealScreen extends StatefulWidget {
 class _FillRevealScreenState extends State<FillRevealScreen> {
   final _api = ApiService();
   final _socket = SocketService();
+  final _rng = Random();
 
   List<Story> _stories = [];
   Room? _room;
   bool _loading = true;
   bool _revealed = false;
+  bool _autoFilling = false;
 
   final _storyController = TextEditingController();
   String get _myId => Supabase.instance.client.auth.currentUser!.id;
   bool get _isHost => _room?.hostId == _myId;
+  bool get _isSolo => (_room?.maxPlayers ?? 2) == 1;
   int get _otherPlayerCount => (_room?.players.length ?? 1) - 1;
 
   @override
@@ -66,6 +83,17 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     }
   }
 
+  void _insertAdj() {
+    final text = _storyController.text;
+    final sel = _storyController.selection;
+    final pos = sel.baseOffset < 0 ? text.length : sel.baseOffset;
+    final newText = text.substring(0, pos) + '[ADJ]' + text.substring(pos);
+    _storyController.value = _storyController.value.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: pos + 5),
+    );
+  }
+
   Future<void> _createStory() async {
     final content = _storyController.text.trim();
     if (content.isEmpty || !content.contains('[ADJ]')) {
@@ -85,10 +113,30 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     try {
       await _api.createStory(widget.roomCode, content);
       _storyController.clear();
-      _load();
+      await _load();
+      if (_isSolo && _stories.isNotEmpty) {
+        await _autoFillSolo(_stories.first);
+      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
+  }
+
+  Future<void> _autoFillSolo(Story story) async {
+    if (mounted) setState(() => _autoFilling = true);
+    final used = <String>{};
+    for (final blank in story.blanks) {
+      String adj;
+      do {
+        adj = _adjectives[_rng.nextInt(_adjectives.length)];
+      } while (used.contains(adj) && used.length < _adjectives.length);
+      used.add(adj);
+      try {
+        await _api.fillBlank(widget.roomCode, story.id, blank.position, adj);
+      } catch (_) {}
+    }
+    await _load();
+    if (mounted) setState(() { _autoFilling = false; _revealed = true; });
   }
 
   Future<void> _fillBlank(Story story, StoryBlank blank) async {
@@ -133,9 +181,31 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: _kAccent))
-          : _stories.isEmpty
-              ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
-              : _buildGameView(),
+          : _autoFilling
+              ? _buildAutoFilling()
+              : _stories.isEmpty
+                  ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
+                  : _buildGameView(),
+    );
+  }
+
+  Widget _buildAutoFilling() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const CircularProgressIndicator(color: _kAccent),
+            const Gap(20),
+            const Text(
+              'Filling with random adjectives…',
+              style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -184,8 +254,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
           const Text('Write a story', style: TextStyle(color: _kText, fontSize: 18, fontWeight: FontWeight.bold)),
           const Gap(8),
           Text(
-            'Use [ADJ] as placeholders for adjectives.\n'
-            '${_otherPlayerCount > 0 ? 'You need at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The [ADJ] cat sat on a [ADJ] mat."'}',
+            _isSolo
+                ? 'Add [ADJ] placeholders — they\'ll be filled with random adjectives when you save.'
+                : 'Use [ADJ] as placeholders for adjectives.\n'
+                    '${_otherPlayerCount > 0 ? 'You need at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The [ADJ] cat sat on a [ADJ] mat."'}',
             style: const TextStyle(color: _kTextSub, fontSize: 14),
           ),
           const Gap(16),
@@ -211,7 +283,35 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
               ),
             ),
           ),
-          const Gap(16),
+          const Gap(10),
+          GestureDetector(
+            onTap: _insertAdj,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: _kAccent.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _kAccent.withValues(alpha: 0.4)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 14, color: _kAccent),
+                  const Gap(4),
+                  const Text(
+                    '[ADJ]',
+                    style: TextStyle(
+                      color: _kAccent,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'monospace',
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const Gap(12),
           SizedBox(
             width: double.infinity,
             height: 52,
@@ -223,7 +323,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                 shadowColor: _kAccent.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: const Text('Save Story', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text(
+                _isSolo ? 'Save & Fill Randomly' : 'Save Story',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+              ),
             ),
           ),
         ],
