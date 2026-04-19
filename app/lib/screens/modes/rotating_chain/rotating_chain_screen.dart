@@ -5,6 +5,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
+const _kAccent = Color(0xFF2DD4BF);
+
 class RotatingChainScreen extends StatefulWidget {
   final String roomCode;
   const RotatingChainScreen({super.key, required this.roomCode});
@@ -73,14 +80,15 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: _kBg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: const BackButton(color: Colors.white),
-        title: const Text('Rotating Chain', style: TextStyle(color: Colors.white)),
+        backgroundColor: _kBg,
+        elevation: 0,
+        leading: const BackButton(color: _kText),
+        title: const Text('Rotating Chain', style: TextStyle(color: _kText)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: _kAccent))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: _isMyTurn && !_submitted
@@ -95,16 +103,26 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('⏳', style: TextStyle(fontSize: 64)).animate().scale(),
-          const Gap(16),
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: _kAccent.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+              border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
+              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 24, spreadRadius: 2)],
+            ),
+            child: const Center(child: Text('⏳', style: TextStyle(fontSize: 40))),
+          ).animate().scale(),
+          const Gap(20),
           const Text(
             'Waiting for your turn…',
-            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(color: _kText, fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const Gap(8),
           Text(
             'Round ${_turnInfo?['roundNumber'] ?? '?'}',
-            style: TextStyle(color: Colors.white.withOpacity(0.5)),
+            style: const TextStyle(color: _kTextSub),
           ),
         ],
       ),
@@ -122,9 +140,10 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF43AA8B).withOpacity(0.15),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF43AA8B).withOpacity(0.4)),
+            color: _kAccent.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: _kAccent.withValues(alpha: 0.35)),
+            boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.1), blurRadius: 16)],
           ),
           child: Row(
             children: [
@@ -135,13 +154,13 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
                 children: [
                   Text(
                     isSentence ? 'Your turn: write a sentence' : 'Your turn: fill the adjective blank',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: _kText, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     isSentence
                         ? 'Include [ADJ] as a placeholder'
                         : 'What adjective fits here?',
-                    style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
+                    style: const TextStyle(color: _kTextSub, fontSize: 12),
                   ),
                 ],
               ),
@@ -150,33 +169,41 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
         ),
         if (previous != null) ...[
           const Gap(16),
-          Text('Previous:', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+          const Text('Previous:', style: TextStyle(color: _kTextSub, fontSize: 12)),
           const Gap(4),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
+              color: _kSurface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: _kBorder),
             ),
-            child: Text(previous, style: TextStyle(color: Colors.white.withOpacity(0.8), fontStyle: FontStyle.italic)),
+            child: Text(previous, style: const TextStyle(color: _kTextSub, fontStyle: FontStyle.italic)),
           ),
         ],
         const Gap(20),
         Expanded(
-          child: TextField(
-            controller: _controller,
-            maxLines: null,
-            expands: true,
-            autofocus: true,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: isSentence
-                  ? 'The [ADJ] wizard walked into the [ADJ] forest…'
-                  : 'mysterious, ancient, fluffy…',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          child: Container(
+            decoration: BoxDecoration(
+              color: _kSurface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: _kBorder),
+            ),
+            child: TextField(
+              controller: _controller,
+              maxLines: null,
+              expands: true,
+              autofocus: true,
+              style: const TextStyle(color: _kText),
+              decoration: InputDecoration(
+                hintText: isSentence
+                    ? 'The [ADJ] wizard walked into the [ADJ] forest…'
+                    : 'mysterious, ancient, fluffy…',
+                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
+                filled: false,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(16),
+              ),
             ),
           ),
         ),
@@ -187,8 +214,10 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
           child: ElevatedButton(
             onPressed: _submitting ? null : _submit,
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF43AA8B),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              backgroundColor: _kAccent,
+              elevation: 8,
+              shadowColor: _kAccent.withValues(alpha: 0.4),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
             child: _submitting
                 ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)

@@ -6,12 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/api_service.dart';
 
-const _kBg = Color(0xFFFDF8F0);
-const _kSurface = Color(0xFFFFFFFF);
-const _kBorder = Color(0xFFE8DDD0);
-const _kText = Color(0xFF2C1A0E);
-const _kTextSub = Color(0xFF9B7B63);
-const _kAccent = Color(0xFF7B5EA7);
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
+const _kAccent = Color(0xFF38BDF8);
 
 class JoinRoomScreen extends StatefulWidget {
   const JoinRoomScreen({super.key});
@@ -38,7 +38,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            backgroundColor: const Color(0xFFC94F3A),
+            backgroundColor: const Color(0xFFFB7185),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
@@ -74,18 +74,17 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header banner
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: _kSurface,
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: _kBorder),
+                  border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
                   boxShadow: [
                     BoxShadow(
-                      color: _kAccent.withValues(alpha: 0.07),
-                      blurRadius: 16,
+                      color: _kAccent.withValues(alpha: 0.1),
+                      blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -96,8 +95,9 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                       width: 52,
                       height: 52,
                       decoration: BoxDecoration(
-                        color: _kAccent.withValues(alpha: 0.12),
+                        color: _kAccent.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
                       ),
                       child: const Center(
                         child: FaIcon(FontAwesomeIcons.doorOpen, color: _kAccent, size: 22),
@@ -186,10 +186,11 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                 child: ElevatedButton(
                   onPressed: (_loading || _controller.text.trim().length < 4) ? null : _join,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _kText,
+                    backgroundColor: _kAccent,
                     disabledBackgroundColor: _kBorder,
-                    foregroundColor: _kBg,
-                    elevation: 0,
+                    foregroundColor: const Color(0xFF060F1E),
+                    elevation: 8,
+                    shadowColor: _kAccent.withValues(alpha: 0.45),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _loading
@@ -197,7 +198,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                            color: Color(0xFFFDF8F0),
+                            color: Color(0xFF060F1E),
                             strokeWidth: 2.5,
                           ),
                         )
@@ -206,7 +207,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                           style: GoogleFonts.lora(
                             fontSize: 17,
                             fontWeight: FontWeight.w600,
-                            color: _kBg,
+                            color: const Color(0xFF060F1E),
                           ),
                         ),
                 ),

@@ -6,11 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
 
-const _kBg = Color(0xFFFDF8F0);
-const _kSurface = Color(0xFFFFFFFF);
-const _kBorder = Color(0xFFE8DDD0);
-const _kText = Color(0xFF2C1A0E);
-const _kTextSub = Color(0xFF9B7B63);
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
 
 class CreateRoomScreen extends StatefulWidget {
   final GameMode mode;
@@ -45,7 +45,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: const Color(0xFFFB7185),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
       }
     } finally {
@@ -108,7 +113,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                         width: selected ? 2 : 1.5,
                       ),
                       boxShadow: selected
-                          ? [BoxShadow(color: color.withValues(alpha: 0.25), blurRadius: 10, offset: const Offset(0, 3))]
+                          ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
                           : [],
                     ),
                     child: Center(
@@ -154,7 +159,8 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: color,
                   foregroundColor: Colors.white,
-                  elevation: 0,
+                  elevation: 8,
+                  shadowColor: color.withValues(alpha: 0.45),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
                 child: _loading
@@ -183,9 +189,9 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       };
 
   Color _modeColor(GameMode mode) => switch (mode) {
-        GameMode.fillReveal => const Color(0xFF7B5EA7),
-        GameMode.rotatingChain => const Color(0xFF3A8C6E),
-        GameMode.battle => const Color(0xFFC94F3A),
+        GameMode.fillReveal => const Color(0xFF818CF8),
+        GameMode.rotatingChain => const Color(0xFF2DD4BF),
+        GameMode.battle => const Color(0xFFFB7185),
       };
 }
 
@@ -217,7 +223,10 @@ class _ModeInfoBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: _kSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 16, offset: const Offset(0, 4)),
+        ],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,8 +235,9 @@ class _ModeInfoBanner extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
+              color: color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: color.withValues(alpha: 0.3)),
             ),
             child: Center(child: FaIcon(icon, color: color, size: 20)),
           ),

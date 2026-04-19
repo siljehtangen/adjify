@@ -7,15 +7,16 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../models/room.dart';
 import '../../services/auth_service.dart';
 
-const _kBg = Color(0xFFFDF8F0);
-const _kSurface = Color(0xFFFFFFFF);
-const _kBorder = Color(0xFFE8DDD0);
-const _kText = Color(0xFF2C1A0E);
-const _kTextSub = Color(0xFF9B7B63);
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
 
-const _kFillReveal = Color(0xFF7B5EA7);
-const _kChain = Color(0xFF3A8C6E);
-const _kBattle = Color(0xFFC94F3A);
+const _kFillReveal = Color(0xFF818CF8);
+const _kChain = Color(0xFF2DD4BF);
+const _kBattle = Color(0xFFFB7185);
+const _kAccent = Color(0xFF38BDF8);
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -32,7 +33,7 @@ class HomeScreen extends StatelessWidget {
         title: Text(
           'Adjify',
           style: GoogleFonts.lora(
-            color: _kText,
+            color: _kAccent,
             fontWeight: FontWeight.w700,
             fontSize: 22,
           ),
@@ -137,8 +138,8 @@ class _ModeCard extends StatelessWidget {
           border: Border.all(color: _kBorder),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.08),
-              blurRadius: 16,
+              color: color.withValues(alpha: 0.15),
+              blurRadius: 20,
               offset: const Offset(0, 4),
             ),
           ],
@@ -149,8 +150,9 @@ class _ModeCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: color.withValues(alpha: 0.3)),
               ),
               child: Center(child: FaIcon(icon, color: color, size: 22)),
             ),
@@ -173,8 +175,9 @@ class _ModeCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.10),
+                      color: color.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: color.withValues(alpha: 0.35)),
                     ),
                     child: Text(
                       playerLabel,
@@ -188,7 +191,7 @@ class _ModeCard extends StatelessWidget {
                 ],
               ),
             ),
-            const FaIcon(FontAwesomeIcons.chevronRight, color: _kBorder, size: 14),
+            FaIcon(FontAwesomeIcons.chevronRight, color: _kBorder.withValues(alpha: 1.0), size: 14),
           ],
         ),
       ),
@@ -211,8 +214,8 @@ class _JoinButton extends StatelessWidget {
           icon: const FaIcon(FontAwesomeIcons.userGroup, size: 16),
           label: const Text('Join a Room'),
           style: OutlinedButton.styleFrom(
-            foregroundColor: _kText,
-            side: const BorderSide(color: _kBorder, width: 1.5),
+            foregroundColor: _kAccent,
+            side: const BorderSide(color: _kAccent, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             textStyle: const TextStyle(fontWeight: FontWeight.w600),
           ),

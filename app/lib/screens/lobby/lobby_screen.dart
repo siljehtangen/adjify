@@ -9,12 +9,12 @@ import '../../models/room.dart';
 import '../../services/api_service.dart';
 import '../../services/socket_service.dart';
 
-const _kBg = Color(0xFFFDF8F0);
-const _kSurface = Color(0xFFFFFFFF);
-const _kBorder = Color(0xFFE8DDD0);
-const _kText = Color(0xFF2C1A0E);
-const _kTextSub = Color(0xFF9B7B63);
-const _kGold = Color(0xFFD4A843);
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
+const _kGold = Color(0xFFFBBF24);
 
 class LobbyScreen extends StatefulWidget {
   final String roomCode;
@@ -69,7 +69,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: const Color(0xFFFB7185),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         );
         setState(() => _starting = false);
       }
@@ -88,10 +93,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   Color get _modeColor => switch (_room?.mode) {
-        GameMode.fillReveal => const Color(0xFF7B5EA7),
-        GameMode.rotatingChain => const Color(0xFF3A8C6E),
-        GameMode.battle => const Color(0xFFC94F3A),
-        null => const Color(0xFF7B5EA7),
+        GameMode.fillReveal => const Color(0xFF818CF8),
+        GameMode.rotatingChain => const Color(0xFF2DD4BF),
+        GameMode.battle => const Color(0xFFFB7185),
+        null => const Color(0xFF38BDF8),
       };
 
   @override
@@ -108,7 +113,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF38BDF8)))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -130,8 +135,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
-                          color: _modeColor.withValues(alpha: 0.10),
+                          color: _modeColor.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: _modeColor.withValues(alpha: 0.35)),
                         ),
                         child: Text(
                           '${_room?.players.length ?? 0} / ${_room?.maxPlayers ?? '?'}',
@@ -162,7 +168,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           child: Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: _modeColor.withValues(alpha: 0.12),
+                                backgroundColor: _modeColor.withValues(alpha: 0.15),
                                 child: Text(
                                   (p.username ?? '?')[0].toUpperCase(),
                                   style: TextStyle(
@@ -184,6 +190,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                   decoration: BoxDecoration(
                                     color: _kGold.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(color: _kGold.withValues(alpha: 0.3)),
                                   ),
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -217,7 +224,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _modeColor,
                           foregroundColor: Colors.white,
-                          elevation: 0,
+                          elevation: 8,
+                          shadowColor: _modeColor.withValues(alpha: 0.45),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: _starting
@@ -233,15 +241,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       ),
                     )
                   else
-                    const Center(
+                    Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: _kTextSub),
-                          Gap(8),
+                          const FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: _kTextSub),
+                          const Gap(8),
                           Text(
                             'Waiting for host to start…',
-                            style: TextStyle(color: _kTextSub),
+                            style: TextStyle(color: _kTextSub.withValues(alpha: 0.8)),
                           ),
                         ],
                       ),
@@ -265,7 +273,14 @@ class _RoomCodeCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: _kSurface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: _kBorder),
+        border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -277,7 +292,7 @@ class _RoomCodeCard extends StatelessWidget {
               Text(
                 roomCode,
                 style: GoogleFonts.lora(
-                  color: _kText,
+                  color: const Color(0xFF38BDF8),
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 4,
@@ -290,19 +305,23 @@ class _RoomCodeCard extends StatelessWidget {
             onTap: () {
               Clipboard.setData(ClipboardData(text: roomCode));
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Code copied!')),
+                SnackBar(
+                  content: const Text('Code copied!'),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               );
             },
             child: Container(
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: _kBg,
+                color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _kBorder),
+                border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
               ),
               child: const Center(
-                child: FaIcon(FontAwesomeIcons.copy, size: 16, color: _kTextSub),
+                child: FaIcon(FontAwesomeIcons.copy, size: 16, color: Color(0xFF38BDF8)),
               ),
             ),
           ),

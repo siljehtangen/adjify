@@ -6,6 +6,13 @@ import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 
+const _kBg = Color(0xFF060F1E);
+const _kSurface = Color(0xFF0B1D35);
+const _kBorder = Color(0xFF1A3A5C);
+const _kText = Color(0xFFEBF4FF);
+const _kTextSub = Color(0xFF7DB9D8);
+const _kAccent = Color(0xFFFB7185);
+
 enum BattlePhase { filling, waiting, voting, results }
 
 class BattleScreen extends StatefulWidget {
@@ -115,14 +122,15 @@ class _BattleScreenState extends State<BattleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: _kBg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: const BackButton(color: Colors.white),
-        title: const Text('Adjective Battle', style: TextStyle(color: Colors.white)),
+        backgroundColor: _kBg,
+        elevation: 0,
+        leading: const BackButton(color: _kText),
+        title: const Text('Adjective Battle', style: TextStyle(color: _kText)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: _kAccent))
           : switch (_phase) {
               BattlePhase.filling => _buildFilling(),
               BattlePhase.waiting => _buildWaiting(),
@@ -141,49 +149,63 @@ class _BattleScreenState extends State<BattleScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Story prompt (with blanks hidden)
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFF6B6B).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFFF6B6B).withOpacity(0.3)),
+              color: _kSurface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: _kAccent.withValues(alpha: 0.35)),
+              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.1), blurRadius: 16)],
             ),
             child: Text(
               content.replaceAll('[ADJ]', '______'),
-              style: const TextStyle(color: Colors.white, fontSize: 16, height: 1.6),
+              style: const TextStyle(color: _kText, fontSize: 16, height: 1.6),
             ),
           ),
           const Gap(24),
-          const Text('Fill in the adjectives', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Fill in the adjectives', style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(12),
           for (var i = 0; i < blankCount; i++) ...[
-            TextField(
-              controller: _adjectives[i],
-              style: const TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                labelText: 'Blank ${i + 1}',
-                labelStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-                filled: true,
-                fillColor: Colors.white.withOpacity(0.05),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            Container(
+              decoration: BoxDecoration(
+                color: _kSurface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _kBorder),
+              ),
+              child: TextField(
+                controller: _adjectives[i],
+                style: const TextStyle(color: _kText),
+                decoration: InputDecoration(
+                  labelText: 'Blank ${i + 1}',
+                  labelStyle: const TextStyle(color: _kTextSub),
+                  filled: false,
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                ),
               ),
             ),
             const Gap(8),
           ],
           const Gap(16),
-          const Text('Your continuation', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Your continuation', style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(8),
-          TextField(
-            controller: _continuationController,
-            maxLines: 4,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Continue the story in your own words…',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.05),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+          Container(
+            decoration: BoxDecoration(
+              color: _kSurface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: _kBorder),
+            ),
+            child: TextField(
+              controller: _continuationController,
+              maxLines: 4,
+              style: const TextStyle(color: _kText),
+              decoration: InputDecoration(
+                hintText: 'Continue the story in your own words…',
+                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
+                filled: false,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(16),
+              ),
             ),
           ),
           const Gap(20),
@@ -193,8 +215,10 @@ class _BattleScreenState extends State<BattleScreen> {
             child: ElevatedButton(
               onPressed: _submitting ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF6B6B),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                backgroundColor: _kAccent,
+                elevation: 8,
+                shadowColor: _kAccent.withValues(alpha: 0.4),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: _submitting
                   ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
@@ -207,15 +231,25 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   Widget _buildWaiting() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text('✅', style: TextStyle(fontSize: 64)),
-          Gap(16),
-          Text('Story submitted!', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-          Gap(8),
-          Text('Waiting for other players…', style: TextStyle(color: Colors.white54)),
+          Container(
+            width: 90,
+            height: 90,
+            decoration: BoxDecoration(
+              color: _kAccent.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+              border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
+              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 24)],
+            ),
+            child: const Center(child: Text('✅', style: TextStyle(fontSize: 40))),
+          ),
+          const Gap(20),
+          const Text('Story submitted!', style: TextStyle(color: _kText, fontSize: 22, fontWeight: FontWeight.bold)),
+          const Gap(8),
+          const Text('Waiting for other players…', style: TextStyle(color: _kTextSub)),
         ],
       ),
     );
@@ -225,7 +259,7 @@ class _BattleScreenState extends State<BattleScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text('Vote for the best story!', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+        const Text('Vote for the best story!', style: TextStyle(color: _kText, fontSize: 20, fontWeight: FontWeight.bold)),
         const Gap(16),
         for (final entry in _results)
           if (entry.playerId != _myId) ...[
@@ -245,7 +279,7 @@ class _BattleScreenState extends State<BattleScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text('🏆 Results', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+        const Text('🏆 Results', style: TextStyle(color: _kText, fontSize: 24, fontWeight: FontWeight.bold)),
         const Gap(16),
         for (var i = 0; i < _results.length; i++) ...[
           _EntryCard(entry: _results[i], voted: false, canVote: false, rank: i + 1),
@@ -276,11 +310,14 @@ class _EntryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: voted ? const Color(0xFFFF6B6B).withOpacity(0.15) : Colors.white.withOpacity(0.05),
+        color: voted ? const Color(0xFFFB7185).withValues(alpha: 0.12) : const Color(0xFF0B1D35),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: voted ? const Color(0xFFFF6B6B).withOpacity(0.5) : Colors.white.withOpacity(0.1),
+          color: voted ? const Color(0xFFFB7185).withValues(alpha: 0.4) : const Color(0xFF1A3A5C),
         ),
+        boxShadow: voted
+            ? [BoxShadow(color: const Color(0xFFFB7185).withValues(alpha: 0.15), blurRadius: 16)]
+            : [],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -288,26 +325,35 @@ class _EntryCard extends StatelessWidget {
           Row(
             children: [
               if (rank != null)
-                Text('#$rank ', style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold, fontSize: 16)),
-              Text(entry.username ?? 'Player', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                Text(
+                  '#$rank ',
+                  style: const TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              Text(
+                entry.username ?? 'Player',
+                style: const TextStyle(color: Color(0xFFEBF4FF), fontWeight: FontWeight.bold),
+              ),
               const Spacer(),
               if (entry.voteCount > 0)
                 Row(
                   children: [
-                    const Icon(Icons.favorite, color: Color(0xFFFF6B6B), size: 16),
+                    const Icon(Icons.favorite, color: Color(0xFFFB7185), size: 16),
                     const Gap(4),
-                    Text('${entry.voteCount}', style: const TextStyle(color: Colors.white54)),
+                    Text('${entry.voteCount}', style: const TextStyle(color: Color(0xFF7DB9D8))),
                   ],
                 ),
             ],
           ),
           const Gap(8),
           if (entry.story != null) ...[
-            Text(entry.story!.rendered, style: const TextStyle(color: Colors.white, height: 1.5)),
+            Text(entry.story!.rendered, style: const TextStyle(color: Color(0xFFEBF4FF), height: 1.5)),
             const Gap(8),
           ],
           if (entry.continuation != null)
-            Text(entry.continuation!, style: TextStyle(color: Colors.white.withOpacity(0.7), fontStyle: FontStyle.italic, height: 1.4)),
+            Text(
+              entry.continuation!,
+              style: const TextStyle(color: Color(0xFF7DB9D8), fontStyle: FontStyle.italic, height: 1.4),
+            ),
           if (canVote) ...[
             const Gap(12),
             SizedBox(
@@ -316,10 +362,12 @@ class _EntryCard extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: onVote,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF6B6B).withOpacity(0.8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  backgroundColor: const Color(0xFFFB7185),
+                  elevation: 6,
+                  shadowColor: const Color(0xFFFB7185).withValues(alpha: 0.4),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
-                child: const Text('Vote', style: TextStyle(color: Colors.white)),
+                child: const Text('Vote', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
