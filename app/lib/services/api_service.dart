@@ -32,6 +32,9 @@ class ApiService {
     return parse(jsonDecode(res.body));
   }
 
+  static T Function(dynamic) _wrap<T>(T Function(Map<String, dynamic>) fromJson) =>
+      (dynamic j) => fromJson(j as Map<String, dynamic>);
+
   void _assertOk(http.Response res) {
     if (res.statusCode >= 400) {
       final body = jsonDecode(res.body);
@@ -41,42 +44,42 @@ class ApiService {
 
   // Rooms
   Future<Room> createRoom(GameMode mode, {int maxPlayers = 6}) =>
-      _post('/api/rooms', {'mode': mode.value, 'maxPlayers': maxPlayers}, Room.fromJson);
+      _post('/api/rooms', {'mode': mode.value, 'maxPlayers': maxPlayers}, _wrap(Room.fromJson));
 
   Future<Room> getRoom(String code) =>
-      _get('/api/rooms/$code', Room.fromJson);
+      _get('/api/rooms/$code', _wrap(Room.fromJson));
 
   Future<Room> joinRoom(String code) =>
-      _post('/api/rooms/$code/join', {}, Room.fromJson);
+      _post('/api/rooms/$code/join', {}, _wrap(Room.fromJson));
 
   Future<void> leaveRoom(String code) =>
       _post('/api/rooms/$code/leave', {}, (_) {});
 
   Future<Room> startGame(String code) =>
-      _post('/api/rooms/$code/start', {}, Room.fromJson);
+      _post('/api/rooms/$code/start', {}, _wrap(Room.fromJson));
 
   // Stories (fill & reveal + battle template)
   Future<Story> createStory(String roomCode, String content) =>
-      _post('/api/rooms/$roomCode/stories', {'content': content}, Story.fromJson);
+      _post('/api/rooms/$roomCode/stories', {'content': content}, _wrap(Story.fromJson));
 
   Future<List<Story>> getStories(String roomCode) =>
-      _get('/api/rooms/$roomCode/stories', (j) => (j as List).map((s) => Story.fromJson(s)).toList());
+      _get('/api/rooms/$roomCode/stories', (j) => (j as List).map((s) => Story.fromJson(s as Map<String, dynamic>)).toList());
 
   Future<Map<String, dynamic>> fillBlank(String roomCode, String storyId, int position, String adjective) =>
       _post('/api/rooms/$roomCode/stories/$storyId/blanks', {'position': position, 'adjective': adjective}, (j) => j as Map<String, dynamic>);
 
   Future<Story> revealStory(String roomCode, String storyId) =>
-      _get('/api/rooms/$roomCode/stories/$storyId/reveal', Story.fromJson);
+      _get('/api/rooms/$roomCode/stories/$storyId/reveal', _wrap(Story.fromJson));
 
   // Chain (mode 2)
   Future<List<ChainSegment>> getChain(String roomCode) =>
-      _get('/api/rooms/$roomCode/chain', (j) => (j as List).map((s) => ChainSegment.fromJson(s)).toList());
+      _get('/api/rooms/$roomCode/chain', (j) => (j as List).map((s) => ChainSegment.fromJson(s as Map<String, dynamic>)).toList());
 
   Future<Map<String, dynamic>> getChainTurn(String roomCode) =>
       _get('/api/rooms/$roomCode/chain/turn', (j) => j as Map<String, dynamic>);
 
   Future<ChainSegment> submitChainSegment(String roomCode, String segmentType, String content) =>
-      _post('/api/rooms/$roomCode/chain/submit', {'segmentType': segmentType, 'content': content}, ChainSegment.fromJson);
+      _post('/api/rooms/$roomCode/chain/submit', {'segmentType': segmentType, 'content': content}, _wrap(ChainSegment.fromJson));
 
   // Battle (mode 3)
   Future<Map<String, dynamic>> getBattlePrompt(String roomCode) =>
@@ -98,7 +101,7 @@ class ApiService {
       _post('/api/rooms/$roomCode/battle/vote', {'entryId': entryId}, (_) {});
 
   Future<List<BattleEntry>> getBattleResults(String roomCode) =>
-      _get('/api/rooms/$roomCode/battle/results', (j) => (j as List).map((e) => BattleEntry.fromJson(e)).toList());
+      _get('/api/rooms/$roomCode/battle/results', (j) => (j as List).map((e) => BattleEntry.fromJson(e as Map<String, dynamic>)).toList());
 }
 
 class ApiException implements Exception {
