@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,8 +12,27 @@ import 'screens/modes/fill_reveal/fill_reveal_screen.dart';
 import 'screens/modes/rotating_chain/rotating_chain_screen.dart';
 import 'screens/modes/battle/battle_screen.dart';
 
+class _AuthNotifier extends ChangeNotifier {
+  late final StreamSubscription<AuthState> _sub;
+
+  _AuthNotifier() {
+    _sub = Supabase.instance.client.auth.onAuthStateChange.listen((_) {
+      notifyListeners();
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
+final _authNotifier = _AuthNotifier();
+
 final router = GoRouter(
   initialLocation: '/',
+  refreshListenable: _authNotifier,
   redirect: (context, state) {
     final isLoggedIn = Supabase.instance.client.auth.currentUser != null;
     final onLoginPage = state.matchedLocation == '/login';
@@ -47,7 +67,6 @@ final router = GoRouter(
     ),
   ],
   errorBuilder: (_, state) => Scaffold(
-    body: Center(child: Text('Page not found: ${state.error}', style: const TextStyle(color: Colors.white))),
-    backgroundColor: const Color(0xFF1A1A2E),
+    body: Center(child: Text('Page not found: ${state.error}')),
   ),
 );
