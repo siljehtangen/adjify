@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
 import '../../services/socket_service.dart';
+
+const _kBg = Color(0xFFFDF8F0);
+const _kSurface = Color(0xFFFFFFFF);
+const _kBorder = Color(0xFFE8DDD0);
+const _kText = Color(0xFF2C1A0E);
+const _kTextSub = Color(0xFF9B7B63);
+const _kGold = Color(0xFFD4A843);
 
 class LobbyScreen extends StatefulWidget {
   final String roomCode;
@@ -69,8 +78,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   void _navigateToGame() {
     if (!mounted) return;
-    final mode = _room?.mode;
-    final route = switch (mode) {
+    final route = switch (_room?.mode) {
       GameMode.fillReveal => '/game/fill-reveal/${widget.roomCode}',
       GameMode.rotatingChain => '/game/chain/${widget.roomCode}',
       GameMode.battle => '/game/battle/${widget.roomCode}',
@@ -79,14 +87,25 @@ class _LobbyScreenState extends State<LobbyScreen> {
     if (route != null) context.go(route);
   }
 
+  Color get _modeColor => switch (_room?.mode) {
+        GameMode.fillReveal => const Color(0xFF7B5EA7),
+        GameMode.rotatingChain => const Color(0xFF3A8C6E),
+        GameMode.battle => const Color(0xFFC94F3A),
+        null => const Color(0xFF7B5EA7),
+      };
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: _kBg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        leading: BackButton(color: Colors.white),
-        title: Text(_room?.mode.displayName ?? 'Lobby', style: const TextStyle(color: Colors.white)),
+        backgroundColor: _kBg,
+        elevation: 0,
+        leading: const BackButton(color: _kText),
+        title: Text(
+          _room?.mode.displayName ?? 'Lobby',
+          style: GoogleFonts.lora(color: _kText, fontWeight: FontWeight.w600),
+        ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
@@ -95,42 +114,35 @@ class _LobbyScreenState extends State<LobbyScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Room code
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Room Code', style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
-                            Text(
-                              widget.roomCode,
-                              style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 4),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Clipboard.setData(ClipboardData(text: widget.roomCode));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Code copied!')),
-                            );
-                          },
-                          icon: const Icon(Icons.copy, color: Colors.white54),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _RoomCodeCard(roomCode: widget.roomCode),
                   const Gap(24),
-                  Text(
-                    'Players (${_room?.players.length ?? 0}/${_room?.maxPlayers ?? '?'})',
-                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
+                  Row(
+                    children: [
+                      Text(
+                        'Players',
+                        style: GoogleFonts.lora(
+                          color: _kText,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const Gap(8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: _modeColor.withValues(alpha: 0.10),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          '${_room?.players.length ?? 0} / ${_room?.maxPlayers ?? '?'}',
+                          style: TextStyle(
+                            color: _modeColor,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const Gap(12),
                   Expanded(
@@ -139,33 +151,55 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       separatorBuilder: (_, __) => const Gap(8),
                       itemBuilder: (ctx, i) {
                         final p = _room!.players[i];
+                        final isHost = p.role == 'host';
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.05),
-                            borderRadius: BorderRadius.circular(12),
+                            color: _kSurface,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: _kBorder),
                           ),
                           child: Row(
                             children: [
                               CircleAvatar(
-                                backgroundColor: Colors.white.withOpacity(0.1),
+                                backgroundColor: _modeColor.withValues(alpha: 0.12),
                                 child: Text(
                                   (p.username ?? '?')[0].toUpperCase(),
-                                  style: const TextStyle(color: Colors.white),
+                                  style: TextStyle(
+                                    color: _modeColor,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
                               ),
                               const Gap(12),
                               Expanded(
-                                child: Text(p.username ?? 'Player', style: const TextStyle(color: Colors.white)),
+                                child: Text(
+                                  p.username ?? 'Player',
+                                  style: const TextStyle(color: _kText, fontWeight: FontWeight.w500),
+                                ),
                               ),
-                              if (p.role == 'host')
+                              if (isHost)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: Colors.amber.withOpacity(0.2),
+                                    color: _kGold.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: const Text('HOST', style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold)),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      FaIcon(FontAwesomeIcons.crown, size: 10, color: _kGold),
+                                      Gap(4),
+                                      Text(
+                                        'HOST',
+                                        style: TextStyle(
+                                          color: _kGold,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                             ],
                           ),
@@ -181,21 +215,99 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       child: ElevatedButton(
                         onPressed: _starting ? null : _start,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6C63FF),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          backgroundColor: _modeColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
                         child: _starting
                             ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                            : const Text('Start Game', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                            : Text(
+                                'Start Game',
+                                style: GoogleFonts.lora(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
                       ),
                     )
                   else
-                    Center(
-                      child: Text('Waiting for host to start…', style: TextStyle(color: Colors.white.withOpacity(0.5))),
+                    const Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: _kTextSub),
+                          Gap(8),
+                          Text(
+                            'Waiting for host to start…',
+                            style: TextStyle(color: _kTextSub),
+                          ),
+                        ],
+                      ),
                     ),
+                  const Gap(8),
                 ],
               ),
             ),
+    );
+  }
+}
+
+class _RoomCodeCard extends StatelessWidget {
+  final String roomCode;
+  const _RoomCodeCard({required this.roomCode});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      decoration: BoxDecoration(
+        color: _kSurface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _kBorder),
+      ),
+      child: Row(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Room Code', style: TextStyle(color: _kTextSub, fontSize: 12)),
+              const Gap(2),
+              Text(
+                roomCode,
+                style: GoogleFonts.lora(
+                  color: _kText,
+                  fontSize: 30,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 4,
+                ),
+              ),
+            ],
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: roomCode));
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Code copied!')),
+              );
+            },
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: _kBg,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _kBorder),
+              ),
+              child: const Center(
+                child: FaIcon(FontAwesomeIcons.copy, size: 16, color: _kTextSub),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

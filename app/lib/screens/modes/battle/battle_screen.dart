@@ -118,7 +118,7 @@ class _BattleScreenState extends State<BattleScreen> {
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: BackButton(color: Colors.white),
+        leading: const BackButton(color: Colors.white),
         title: const Text('Adjective Battle', style: TextStyle(color: Colors.white)),
       ),
       body: _loading

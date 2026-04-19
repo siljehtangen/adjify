@@ -76,7 +76,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       backgroundColor: const Color(0xFF1A1A2E),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: BackButton(color: Colors.white),
+        leading: const BackButton(color: Colors.white),
         title: const Text('Rotating Chain', style: TextStyle(color: Colors.white)),
       ),
       body: _loading

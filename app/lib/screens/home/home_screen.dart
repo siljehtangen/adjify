@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../models/room.dart';
 import '../../services/auth_service.dart';
+
+const _kBg = Color(0xFFFDF8F0);
+const _kSurface = Color(0xFFFFFFFF);
+const _kBorder = Color(0xFFE8DDD0);
+const _kText = Color(0xFF2C1A0E);
+const _kTextSub = Color(0xFF9B7B63);
+
+const _kFillReveal = Color(0xFF7B5EA7);
+const _kChain = Color(0xFF3A8C6E);
+const _kBattle = Color(0xFFC94F3A);
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -13,13 +25,21 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: _kBg,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const Text('Adjify', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+        backgroundColor: _kBg,
+        elevation: 0,
+        title: Text(
+          'Adjify',
+          style: GoogleFonts.lora(
+            color: _kText,
+            fontWeight: FontWeight.w700,
+            fontSize: 22,
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: _kTextSub),
             onPressed: () async {
               await _auth.signOut();
               if (context.mounted) context.go('/login');
@@ -29,64 +49,55 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Choose a mode',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.9)),
+                style: GoogleFonts.lora(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w700,
+                  color: _kText,
+                ),
               ).animate().fadeIn(),
-              const Gap(8),
-              Text(
-                'Or join a friend\'s room',
-                style: TextStyle(color: Colors.white.withOpacity(0.5)),
-              ).animate().fadeIn(delay: 100.ms),
-              const Gap(32),
-              _ModeCard(
-                emoji: '🧩',
+              const Gap(4),
+              const Text(
+                'Or join a friend\'s room below',
+                style: TextStyle(color: _kTextSub, fontSize: 14),
+              ).animate().fadeIn(delay: 80.ms),
+              const Gap(28),
+              const _ModeCard(
+                icon: FontAwesomeIcons.bookOpen,
                 title: 'Fill & Reveal',
-                subtitle: 'Fill hidden adjective blanks alone or with friends',
-                color: const Color(0xFF6C63FF),
+                subtitle: 'Fill hidden adjective blanks — solo or with friends',
+                color: _kFillReveal,
                 mode: GameMode.fillReveal,
-                minPlayers: '1+',
+                playerLabel: '1 – ★ blanks',
                 delay: 0,
               ),
-              const Gap(16),
-              _ModeCard(
-                emoji: '🔁',
+              const Gap(14),
+              const _ModeCard(
+                icon: FontAwesomeIcons.arrowsRotate,
                 title: 'Rotating Chain',
                 subtitle: 'Build a chaotic story step-by-step in secret',
-                color: const Color(0xFF43AA8B),
+                color: _kChain,
                 mode: GameMode.rotatingChain,
-                minPlayers: '3–6',
+                playerLabel: '2 – 6 players',
                 delay: 100,
               ),
-              const Gap(16),
-              _ModeCard(
-                emoji: '⚔️',
+              const Gap(14),
+              const _ModeCard(
+                icon: FontAwesomeIcons.trophy,
                 title: 'Adjective Battle',
                 subtitle: 'Compete to make the funniest story from the same prompt',
-                color: const Color(0xFFFF6B6B),
+                color: _kBattle,
                 mode: GameMode.battle,
-                minPlayers: '3–8',
+                playerLabel: '2 – 8 players',
                 delay: 200,
               ),
               const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: OutlinedButton.icon(
-                  onPressed: () => context.push('/join'),
-                  icon: const Icon(Icons.group_add),
-                  label: const Text('Join a Room'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: BorderSide(color: Colors.white.withOpacity(0.3)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                ),
-              ).animate().fadeIn(delay: 400.ms),
+              const _JoinButton(),
             ],
           ),
         ),
@@ -96,21 +107,21 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _ModeCard extends StatelessWidget {
-  final String emoji;
+  final IconData icon;
   final String title;
   final String subtitle;
   final Color color;
   final GameMode mode;
-  final String minPlayers;
+  final String playerLabel;
   final int delay;
 
   const _ModeCard({
-    required this.emoji,
+    required this.icon,
     required this.title,
     required this.subtitle,
     required this.color,
     required this.mode,
-    required this.minPlayers,
+    required this.playerLabel,
     required this.delay,
   });
 
@@ -121,38 +132,92 @@ class _ModeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.4)),
+          color: _kSurface,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: _kBorder),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 36)),
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(child: FaIcon(icon, color: color, size: 22)),
+            ),
             const Gap(16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                      const Gap(8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: color.withOpacity(0.3), borderRadius: BorderRadius.circular(20)),
-                        child: Text(minPlayers, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
+                  Text(
+                    title,
+                    style: GoogleFonts.lora(
+                      color: _kText,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  const Gap(4),
-                  Text(subtitle, style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 13)),
+                  const Gap(3),
+                  Text(subtitle, style: const TextStyle(color: _kTextSub, fontSize: 13)),
+                  const Gap(6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      playerLabel,
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: Colors.white.withOpacity(0.4), size: 16),
+            const FaIcon(FontAwesomeIcons.chevronRight, color: _kBorder, size: 14),
           ],
         ),
       ),
-    ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.1, end: 0);
+    ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.06, end: 0);
+  }
+}
+
+class _JoinButton extends StatelessWidget {
+  const _JoinButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 52,
+        child: OutlinedButton.icon(
+          onPressed: () => context.push('/join'),
+          icon: const FaIcon(FontAwesomeIcons.userGroup, size: 16),
+          label: const Text('Join a Room'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: _kText,
+            side: const BorderSide(color: _kBorder, width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            textStyle: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ).animate().fadeIn(delay: 350.ms),
+    );
   }
 }
