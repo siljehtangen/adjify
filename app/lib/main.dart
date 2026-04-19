@@ -25,9 +25,9 @@ class AdjifyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF6C63FF),
+          seedColor: const Color(0xFF38BDF8),
           brightness: Brightness.dark,
-          surface: const Color(0xFF1A1A2E),
+          surface: const Color(0xFF060F1E),
         ),
         textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,
