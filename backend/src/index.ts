@@ -12,14 +12,16 @@ import { setupSockets } from './services/socketService.js';
 const app = express();
 const httpServer = createServer(app);
 
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:8080').split(',').map(o => o.trim());
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: allowedOrigins,
     credentials: true,
   },
 });
 
-app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:3001', credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // Attach io instance to requests so routes can emit events
