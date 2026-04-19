@@ -2,7 +2,7 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode } from '../services/roomService.js';
-import { createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
+import { countBlanks, createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
 import { supabase } from '../config/supabase.js';
 
 const router = Router({ mergeParams: true });
@@ -20,6 +20,19 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
 
   try {
     const room = await getRoomByCode(req.params.code);
+
+    if (room.mode === 'fill_reveal') {
+      const playerCount = room.room_players.length;
+      const otherPlayers = playerCount - 1;
+      const minBlanks = otherPlayers > 0 ? otherPlayers : 1;
+      const blankCount = countBlanks(parsed.data.content);
+      if (blankCount < minBlanks) {
+        return res.status(400).json({
+          error: `Story must have at least ${minBlanks} [ADJ] blank${minBlanks !== 1 ? 's' : ''} — one per player`,
+        });
+      }
+    }
+
     const story = await createStory(room.id, parsed.data.content, req.user!.id);
     return res.status(201).json(story);
   } catch (err: any) {
@@ -50,6 +63,10 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
   if (!parsed.success) return res.status(400).json({ error: parsed.error.flatten() });
 
   try {
+    const story = await getStoryWithBlanks(req.params.storyId);
+    if (story.created_by === req.user!.id) {
+      return res.status(403).json({ error: 'The story writer cannot fill their own blanks' });
+    }
     const result = await fillBlank(
       req.params.storyId,
       parsed.data.position,

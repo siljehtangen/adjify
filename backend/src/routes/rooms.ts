@@ -7,7 +7,7 @@ const router = Router();
 
 const createRoomSchema = z.object({
   mode: z.enum(['fill_reveal', 'rotating_chain', 'battle']),
-  maxPlayers: z.number().int().min(1).max(8).default(6),
+  maxPlayers: z.number().int().min(1).max(10).default(6),
 });
 
 router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
@@ -18,7 +18,8 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
     const room = await createRoom(req.user!.id, parsed.data.mode, parsed.data.maxPlayers);
     return res.status(201).json(room);
   } catch (err: any) {
-    return res.status(500).json({ error: err.message });
+    console.error('[POST /api/rooms]', err);
+    return res.status(500).json({ error: err.message, details: err.details ?? err.hint ?? undefined });
   }
 });
 
@@ -36,7 +37,8 @@ router.post('/:code/join', authenticate, async (req: AuthRequest, res: Response)
     const room = await joinRoom(req.params.code, req.user!.id);
     return res.json(room);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    console.error('[POST /api/rooms/:code/join]', err);
+    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
   }
 });
 
@@ -46,7 +48,8 @@ router.post('/:code/leave', authenticate, async (req: AuthRequest, res: Response
     await leaveRoom(room.id, req.user!.id);
     return res.json({ success: true });
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    console.error('[POST /api/rooms/:code/leave]', err);
+    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
   }
 });
 
@@ -56,7 +59,8 @@ router.post('/:code/start', authenticate, async (req: AuthRequest, res: Response
     const updated = await startGame(room.id, req.user!.id);
     return res.json(updated);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    console.error('[POST /api/rooms/:code/start]', err);
+    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
   }
 });
 
