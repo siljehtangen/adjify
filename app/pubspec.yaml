@@ -23,8 +23,9 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_animate: ^4.5.0
   gap: ^3.0.1
+  font_awesome_flutter: ^10.7.0
   # Utils
-  envied: ^0.5.4+1
+  envied: ^1.0.0
   uuid: ^4.4.0
 
 dev_dependencies:
@@ -33,7 +34,7 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   build_runner: ^2.4.11
   riverpod_generator: ^2.4.3
-  envied_generator: ^0.5.4+1
+  envied_generator: ^1.1.0
 
 flutter:
   uses-material-design: true
