@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
@@ -16,18 +15,6 @@ const _kText = Color(0xFFEBF4FF);
 const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFF818CF8);
 
-const _adjectives = [
-  'mysterious', 'fluffy', 'ancient', 'enormous', 'sparkly',
-  'suspicious', 'wobbly', 'magnificent', 'grumpy', 'luminous',
-  'peculiar', 'squishy', 'majestic', 'bewildered', 'colossal',
-  'wiggly', 'glamorous', 'ferocious', 'bouncy', 'ethereal',
-  'crusty', 'vibrant', 'sleepy', 'thunderous', 'invisible',
-  'mushy', 'radiant', 'frantic', 'velvety', 'gigantic',
-  'smelly', 'dazzling', 'whimsical', 'catastrophic', 'soggy',
-  'bubbly', 'ominous', 'tremendous', 'gloopy', 'frilly',
-  'grumbling', 'electric', 'melancholy', 'crispy', 'fuzzy',
-  'shimmering', 'pompous', 'oblivious', 'mischievous', 'wobbly',
-];
 
 class FillRevealScreen extends StatefulWidget {
   final String roomCode;
@@ -40,13 +27,11 @@ class FillRevealScreen extends StatefulWidget {
 class _FillRevealScreenState extends State<FillRevealScreen> {
   final _api = ApiService();
   final _socket = SocketService();
-  final _rng = Random();
 
   List<Story> _stories = [];
   Room? _room;
   bool _loading = true;
   bool _revealed = false;
-  bool _autoFilling = false;
 
   final _storyController = TextEditingController();
   String get _myId => Supabase.instance.client.auth.currentUser!.id;
@@ -114,30 +99,11 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       await _api.createStory(widget.roomCode, content);
       _storyController.clear();
       await _load();
-      if (_isSolo && _stories.isNotEmpty) {
-        await _autoFillSolo(_stories.first);
-      }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
-  Future<void> _autoFillSolo(Story story) async {
-    if (mounted) setState(() => _autoFilling = true);
-    final used = <String>{};
-    for (final blank in story.blanks) {
-      String adj;
-      do {
-        adj = _adjectives[_rng.nextInt(_adjectives.length)];
-      } while (used.contains(adj) && used.length < _adjectives.length);
-      used.add(adj);
-      try {
-        await _api.fillBlank(widget.roomCode, story.id, blank.position, adj);
-      } catch (_) {}
-    }
-    await _load();
-    if (mounted) setState(() { _autoFilling = false; _revealed = true; });
-  }
 
   Future<void> _fillBlank(Story story, StoryBlank blank) async {
     if (blank.isFilled) return;
@@ -181,31 +147,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: _kAccent))
-          : _autoFilling
-              ? _buildAutoFilling()
-              : _stories.isEmpty
-                  ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
-                  : _buildGameView(),
-    );
-  }
-
-  Widget _buildAutoFilling() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircularProgressIndicator(color: _kAccent),
-            const Gap(20),
-            const Text(
-              'Filling with random adjectives…',
-              style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+          : _stories.isEmpty
+              ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
+              : _buildGameView(),
     );
   }
 
@@ -246,7 +190,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
 
   Widget _buildStoryCreator() {
     final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,25 +205,23 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
             style: const TextStyle(color: _kTextSub, fontSize: 14),
           ),
           const Gap(16),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: _kSurface,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: _kBorder),
-              ),
-              child: TextField(
-                controller: _storyController,
-                maxLines: null,
-                expands: true,
-                style: const TextStyle(color: _kText),
-                decoration: InputDecoration(
-                  hintText: 'Write your story here…',
-                  hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
-                  filled: false,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.all(16),
-                ),
+          Container(
+            decoration: BoxDecoration(
+              color: _kSurface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: _kBorder),
+            ),
+            child: TextField(
+              controller: _storyController,
+              minLines: 8,
+              maxLines: 16,
+              style: const TextStyle(color: _kText),
+              decoration: InputDecoration(
+                hintText: 'Write your story here…',
+                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
+                filled: false,
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.all(16),
               ),
             ),
           ),
@@ -329,6 +271,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
               ),
             ),
           ),
+          const Gap(24),
         ],
       ),
     );
@@ -342,7 +285,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!_revealed) ...[
-            if (_isHost) ...[
+            if (_isHost && !_isSolo) ...[
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
@@ -365,6 +308,19 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
               ),
               const Gap(16),
             ],
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: _kSurface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: _kBorder),
+              ),
+              child: Text(
+                story.rendered,
+                style: const TextStyle(color: _kText, fontSize: 16, height: 1.6),
+              ),
+            ),
+            const Gap(20),
             Row(
               children: [
                 Text(
@@ -385,8 +341,8 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                 ),
               ],
             ),
-            const Gap(24),
-            if (!_isHost)
+            const Gap(16),
+            if (!_isHost || _isSolo)
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
