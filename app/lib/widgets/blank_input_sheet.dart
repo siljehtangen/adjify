@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import '../config/app_colors.dart';
 
 class BlankInputSheet extends StatefulWidget {
   final int position;
@@ -23,15 +24,11 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
     return Container(
       padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF192C44),
+        color: kSurface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.2)),
+        border: Border.all(color: kAccent.withValues(alpha: 0.2)),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF38BDF8).withValues(alpha: 0.08),
-            blurRadius: 30,
-            spreadRadius: 2,
-          ),
+          BoxShadow(color: kAccent.withValues(alpha: 0.08), blurRadius: 30, spreadRadius: 2),
         ],
       ),
       child: Column(
@@ -44,13 +41,11 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF818CF8).withValues(alpha: 0.15),
+                  color: kFillReveal.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFF818CF8).withValues(alpha: 0.3)),
+                  border: Border.all(color: kFillReveal.withValues(alpha: 0.3)),
                 ),
-                child: const Center(
-                  child: Icon(Icons.edit, color: Color(0xFF818CF8), size: 18),
-                ),
+                child: const Center(child: Icon(Icons.edit, color: kFillReveal, size: 18)),
               ),
               const Gap(12),
               Column(
@@ -58,12 +53,9 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
                 children: [
                   Text(
                     'Blank ${widget.position + 1}',
-                    style: const TextStyle(color: Color(0xFFEBF4FF), fontSize: 17, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: kText, fontSize: 17, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Enter an adjective',
-                    style: TextStyle(color: Color(0xFF7DB9D8), fontSize: 13),
-                  ),
+                  const Text('Enter an adjective', style: TextStyle(color: kTextSub, fontSize: 13)),
                 ],
               ),
             ],
@@ -71,18 +63,18 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
           const Gap(18),
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF101D2E),
+              color: kBg,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF284D6E)),
+              border: Border.all(color: kBorder),
             ),
             child: TextField(
               controller: _controller,
               autofocus: true,
               textCapitalization: TextCapitalization.none,
-              style: const TextStyle(color: Color(0xFFEBF4FF), fontSize: 20),
+              style: const TextStyle(color: kText, fontSize: 20),
               decoration: const InputDecoration(
                 hintText: 'e.g. mysterious, fluffy, ancient…',
-                hintStyle: TextStyle(color: Color(0xFF7DB9D8)),
+                hintStyle: TextStyle(color: kTextSub),
                 filled: false,
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -97,9 +89,9 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
             child: ElevatedButton(
               onPressed: () => Navigator.of(context).pop(_controller.text.trim()),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF818CF8),
+                backgroundColor: kFillReveal,
                 elevation: 8,
-                shadowColor: const Color(0xFF818CF8).withValues(alpha: 0.4),
+                shadowColor: kFillReveal.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               child: const Text('Confirm', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
