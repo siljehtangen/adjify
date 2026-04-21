@@ -4,6 +4,7 @@ import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode } from '../services/roomService.js';
 import { countBlanks, createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
 import { supabase } from '../config/supabase.js';
+import { routeError } from '../utils/routeError.js';
 
 const router = Router({ mergeParams: true });
 
@@ -36,7 +37,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
     const story = await createStory(room.id, parsed.data.content, req.user!.id);
     return res.status(201).json(story);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -53,7 +54,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     if (error) throw error;
     return res.json(data);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -75,7 +76,7 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
     );
     return res.json(result);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -89,7 +90,7 @@ router.get('/:storyId/reveal', authenticate, async (req: AuthRequest, res: Respo
     }
     return res.json(story);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
