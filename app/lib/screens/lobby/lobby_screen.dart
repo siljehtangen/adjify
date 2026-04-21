@@ -5,16 +5,11 @@ import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../config/app_colors.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
 import '../../services/socket_service.dart';
-
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
-const _kGold = Color(0xFFFBBF24);
+import '../../widgets/game_widgets.dart';
 
 class LobbyScreen extends StatefulWidget {
   final String roomCode;
@@ -68,14 +63,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       _navigateToGame();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: const Color(0xFFFB7185),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
+        showErrorSnackBar(context, e.toString());
         setState(() => _starting = false);
       }
     }
@@ -93,27 +81,27 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   Color get _modeColor => switch (_room?.mode) {
-        GameMode.fillReveal => const Color(0xFF818CF8),
-        GameMode.rotatingChain => const Color(0xFF2DD4BF),
-        GameMode.battle => const Color(0xFFFB7185),
-        null => const Color(0xFF38BDF8),
+        GameMode.fillReveal => kFillReveal,
+        GameMode.rotatingChain => kChain,
+        GameMode.battle => kBattle,
+        null => kAccent,
       };
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        leading: const BackButton(color: _kText),
+        leading: const BackButton(color: kText),
         title: Text(
           _room?.mode.displayName ?? 'Lobby',
-          style: GoogleFonts.lora(color: _kText, fontWeight: FontWeight.w600),
+          style: GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600),
         ),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFF38BDF8)))
+          ? const Center(child: CircularProgressIndicator(color: kAccent))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -125,11 +113,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     children: [
                       Text(
                         'Players',
-                        style: GoogleFonts.lora(
-                          color: _kText,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600),
                       ),
                       const Gap(8),
                       Container(
@@ -141,11 +125,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         ),
                         child: Text(
                           '${_room?.players.length ?? 0} / ${_room?.maxPlayers ?? '?'}',
-                          style: TextStyle(
-                            color: _modeColor,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(color: _modeColor, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -161,9 +141,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         return Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
-                            color: _kSurface,
+                            color: kSurface,
                             borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: _kBorder),
+                            border: Border.all(color: kBorder),
                           ),
                           child: Row(
                             children: [
@@ -171,39 +151,32 @@ class _LobbyScreenState extends State<LobbyScreen> {
                                 backgroundColor: _modeColor.withValues(alpha: 0.15),
                                 child: Text(
                                   (p.username ?? '?')[0].toUpperCase(),
-                                  style: TextStyle(
-                                    color: _modeColor,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                  style: TextStyle(color: _modeColor, fontWeight: FontWeight.w700),
                                 ),
                               ),
                               const Gap(12),
                               Expanded(
                                 child: Text(
                                   p.username ?? 'Player',
-                                  style: const TextStyle(color: _kText, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(color: kText, fontWeight: FontWeight.w500),
                                 ),
                               ),
                               if (isHost)
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(
-                                    color: _kGold.withValues(alpha: 0.15),
+                                    color: kGold.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(20),
-                                    border: Border.all(color: _kGold.withValues(alpha: 0.3)),
+                                    border: Border.all(color: kGold.withValues(alpha: 0.3)),
                                   ),
                                   child: const Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      FaIcon(FontAwesomeIcons.crown, size: 10, color: _kGold),
+                                      FaIcon(FontAwesomeIcons.crown, size: 10, color: kGold),
                                       Gap(4),
                                       Text(
                                         'HOST',
-                                        style: TextStyle(
-                                          color: _kGold,
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: TextStyle(color: kGold, fontSize: 10, fontWeight: FontWeight.w700),
                                       ),
                                     ],
                                   ),
@@ -232,11 +205,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                             ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                             : Text(
                                 'Start Game',
-                                style: GoogleFonts.lora(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
+                                style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
                               ),
                       ),
                     )
@@ -245,11 +214,11 @@ class _LobbyScreenState extends State<LobbyScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: _kTextSub),
+                          const FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: kTextSub),
                           const Gap(8),
                           Text(
                             'Waiting for host to start…',
-                            style: TextStyle(color: _kTextSub.withValues(alpha: 0.8)),
+                            style: TextStyle(color: kTextSub.withValues(alpha: 0.8)),
                           ),
                         ],
                       ),
@@ -271,15 +240,11 @@ class _RoomCodeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       decoration: BoxDecoration(
-        color: _kSurface,
+        color: kSurface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
+        border: Border.all(color: kAccent.withValues(alpha: 0.3)),
         boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF38BDF8).withValues(alpha: 0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: kAccent.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -287,12 +252,12 @@ class _RoomCodeCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Room Code', style: TextStyle(color: _kTextSub, fontSize: 12)),
+              const Text('Room Code', style: TextStyle(color: kTextSub, fontSize: 12)),
               const Gap(2),
               Text(
                 roomCode,
                 style: GoogleFonts.lora(
-                  color: const Color(0xFF38BDF8),
+                  color: kAccent,
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 4,
@@ -316,13 +281,11 @@ class _RoomCodeCard extends StatelessWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
+                color: kAccent.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3)),
+                border: Border.all(color: kAccent.withValues(alpha: 0.3)),
               ),
-              child: const Center(
-                child: FaIcon(FontAwesomeIcons.copy, size: 16, color: Color(0xFF38BDF8)),
-              ),
+              child: const Center(child: FaIcon(FontAwesomeIcons.copy, size: 16, color: kAccent)),
             ),
           ),
         ],
