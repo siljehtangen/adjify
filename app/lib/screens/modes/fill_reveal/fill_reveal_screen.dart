@@ -78,17 +78,13 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   Future<void> _createStory() async {
     final content = _storyController.text.trim();
     if (content.isEmpty || !content.contains('[ADJ]')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Story must contain at least one [ADJ] placeholder')),
-      );
+      showErrorSnackBar(context, 'Story must contain at least one [ADJ] placeholder');
       return;
     }
     final blankCount = '[ADJ]'.allMatches(content).length;
     final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
     if (blankCount < minBlanks) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Add at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player')),
-      );
+      showErrorSnackBar(context, 'Add at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player');
       return;
     }
     try {
@@ -96,7 +92,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       _storyController.clear();
       await _load();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) showErrorSnackBar(context, e.toString());
     }
   }
 
@@ -116,7 +112,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       _load();
       if (result['isComplete'] == true) setState(() => _revealed = true);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) showErrorSnackBar(context, e.toString());
     }
   }
 
