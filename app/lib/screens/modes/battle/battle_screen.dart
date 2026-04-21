@@ -99,7 +99,7 @@ class _BattleScreenState extends State<BattleScreen> {
       if (result['allSubmitted'] == true) _loadResults();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        showErrorSnackBar(context, e.toString());
         setState(() => _submitting = false);
       }
     }
@@ -112,7 +112,7 @@ class _BattleScreenState extends State<BattleScreen> {
       setState(() => _votedEntryId = entryId);
       _loadResults();
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted) showErrorSnackBar(context, e.toString());
     }
   }
 
