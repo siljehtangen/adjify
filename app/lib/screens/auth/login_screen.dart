@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
+import '../../config/app_colors.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/game_widgets.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,16 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _auth.signInWithGoogle();
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Sign in failed: $e'),
-            backgroundColor: const Color(0xFFFB7185),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      }
+      if (mounted) showErrorSnackBar(context, 'Sign in failed: $e');
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -42,11 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF101D2E),
-              Color(0xFF172938),
-              Color(0xFF1B3050),
-            ],
+            colors: [kBg, Color(0xFF172938), Color(0xFF1B3050)],
           ),
         ),
         child: SafeArea(
@@ -60,20 +49,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 90,
                     height: 90,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF38BDF8).withValues(alpha: 0.12),
+                      color: kAccent.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFF38BDF8).withValues(alpha: 0.3), width: 2),
+                      border: Border.all(color: kAccent.withValues(alpha: 0.3), width: 2),
                       boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF38BDF8).withValues(alpha: 0.2),
-                          blurRadius: 30,
-                          spreadRadius: 4,
-                        ),
+                        BoxShadow(color: kAccent.withValues(alpha: 0.2), blurRadius: 30, spreadRadius: 4),
                       ],
                     ),
-                    child: const Center(
-                      child: Text('📖', style: TextStyle(fontSize: 42)),
-                    ),
+                    child: const Center(child: Text('📖', style: TextStyle(fontSize: 42))),
                   ).animate().scale(duration: 600.ms, curve: Curves.elasticOut),
                   const Gap(24),
                   const Text(
@@ -81,14 +64,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFFEBF4FF),
+                      color: kText,
                       letterSpacing: -1,
                     ),
                   ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
                   const Gap(8),
                   Text(
                     'The adjective storytelling game',
-                    style: TextStyle(fontSize: 16, color: const Color(0xFF7DB9D8).withValues(alpha: 0.9)),
+                    style: TextStyle(fontSize: 16, color: kTextSub.withValues(alpha: 0.9)),
                   ).animate().fadeIn(delay: 400.ms),
                   const Gap(72),
                   SizedBox(
@@ -110,17 +93,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                       label: Text(
                         _loading ? 'Signing in…' : 'Continue with Google',
-                        style: const TextStyle(
-                          color: Color(0xFF060F1E),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                        ),
+                        style: const TextStyle(color: Color(0xFF060F1E), fontWeight: FontWeight.w700, fontSize: 16),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF38BDF8),
+                        backgroundColor: kAccent,
                         foregroundColor: const Color(0xFF060F1E),
                         elevation: 8,
-                        shadowColor: const Color(0xFF38BDF8).withValues(alpha: 0.5),
+                        shadowColor: kAccent.withValues(alpha: 0.5),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                     ),
