@@ -25,9 +25,9 @@ class SocketService {
           .build(),
     );
 
-    _socket!.onConnect((_) => print('Socket connected'));
-    _socket!.onDisconnect((_) => print('Socket disconnected'));
-    _socket!.onError((err) => print('Socket error: $err'));
+    _socket!.onConnect((_) {});
+    _socket!.onDisconnect((_) {});
+    _socket!.onError((_) {});
   }
 
   void joinRoom(String roomCode) {
