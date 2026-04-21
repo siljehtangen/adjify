@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode } from '../services/roomService.js';
+import { routeError } from '../utils/routeError.js';
 import {
   submitBattleEntry,
   castVote,
@@ -36,7 +37,7 @@ router.get('/prompt', authenticate, async (req: AuthRequest, res: Response) => {
     if (error) return res.status(404).json({ error: 'No prompt created yet' });
     return res.json(data);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -81,7 +82,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     return res.status(201).json({ entry, allSubmitted: done });
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -95,7 +96,7 @@ router.post('/vote', authenticate, async (req: AuthRequest, res: Response) => {
     await castVote(room.id, req.user!.id, parsed.data.entryId);
     return res.json({ success: true });
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -106,7 +107,7 @@ router.get('/results', authenticate, async (req: AuthRequest, res: Response) => 
     const results = await getResults(room.id);
     return res.json(results);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
