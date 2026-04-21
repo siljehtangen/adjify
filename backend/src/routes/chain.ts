@@ -1,9 +1,9 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
-import { getRoomByCode } from '../services/roomService.js';
+import { getRoomByCode, getPlayerListForRoom } from '../services/roomService.js';
 import { addChainSegment, getChainSegments, getLastSegment, getNextPlayer } from '../services/chainService.js';
-import { supabase } from '../config/supabase.js';
+import { routeError } from '../utils/routeError.js';
 
 const router = Router({ mergeParams: true });
 
@@ -19,7 +19,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     const segments = await getChainSegments(room.id);
     return res.json(segments);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -28,14 +28,7 @@ router.get('/turn', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const room = await getRoomByCode(req.params.code);
     const last = await getLastSegment(room.id);
-
-    const { data: players } = await supabase
-      .from('room_players')
-      .select('player_id')
-      .eq('room_id', room.id)
-      .order('joined_at');
-
-    const playerIds = (players || []).map((p: { player_id: string }) => p.player_id);
+    const playerIds = await getPlayerListForRoom(room.id);
     const nextPlayerId = getNextPlayer(playerIds, last?.author_id ?? null, last?.round_number ?? 0);
     const nextType = last?.segment_type === 'sentence' ? 'blank_fill' : 'sentence';
 
@@ -47,7 +40,7 @@ router.get('/turn', authenticate, async (req: AuthRequest, res: Response) => {
       previousContent: last?.segment_type === 'sentence' ? last.content : undefined,
     });
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
@@ -61,13 +54,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     // Verify it's the requester's turn
     const last = await getLastSegment(room.id);
-    const { data: players } = await supabase
-      .from('room_players')
-      .select('player_id')
-      .eq('room_id', room.id)
-      .order('joined_at');
-
-    const playerIds = (players || []).map((p: { player_id: string }) => p.player_id);
+    const playerIds = await getPlayerListForRoom(room.id);
     const expected = getNextPlayer(playerIds, last?.author_id ?? null, last?.round_number ?? 0);
 
     if (expected !== req.user!.id) {
@@ -83,7 +70,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     return res.status(201).json(segment);
   } catch (err: any) {
-    return res.status(400).json({ error: err.message });
+    return routeError(res, err);
   }
 });
 
