@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../config/app_colors.dart';
 import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
+import '../../../widgets/game_widgets.dart';
 
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFFFB7185);
 
 enum BattlePhase { filling, waiting, voting, results }
@@ -122,12 +119,12 @@ class _BattleScreenState extends State<BattleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        leading: const BackButton(color: _kText),
-        title: const Text('Adjective Battle', style: TextStyle(color: _kText)),
+        leading: const BackButton(color: kText),
+        title: const Text('Adjective Battle', style: TextStyle(color: kText)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: _kAccent))
@@ -152,78 +149,37 @@ class _BattleScreenState extends State<BattleScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _kSurface,
+              color: kSurface,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: _kAccent.withValues(alpha: 0.35)),
               boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.1), blurRadius: 16)],
             ),
             child: Text(
               content.replaceAll('[ADJ]', '______'),
-              style: const TextStyle(color: _kText, fontSize: 16, height: 1.6),
+              style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
             ),
           ),
           const Gap(24),
-          const Text('Fill in the adjectives', style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Fill in the adjectives', style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(12),
           for (var i = 0; i < blankCount; i++) ...[
-            Container(
-              decoration: BoxDecoration(
-                color: _kSurface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _kBorder),
-              ),
-              child: TextField(
-                controller: _adjectives[i],
-                style: const TextStyle(color: _kText),
-                decoration: InputDecoration(
-                  labelText: 'Blank ${i + 1}',
-                  labelStyle: const TextStyle(color: _kTextSub),
-                  filled: false,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                ),
-              ),
-            ),
+            GameTextField(controller: _adjectives[i]!, labelText: 'Blank ${i + 1}'),
             const Gap(8),
           ],
           const Gap(16),
-          const Text('Your continuation', style: TextStyle(color: _kText, fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('Your continuation', style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(8),
-          Container(
-            decoration: BoxDecoration(
-              color: _kSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _kBorder),
-            ),
-            child: TextField(
-              controller: _continuationController,
-              maxLines: 4,
-              style: const TextStyle(color: _kText),
-              decoration: InputDecoration(
-                hintText: 'Continue the story in your own words…',
-                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
-                filled: false,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
+          GameTextField(
+            controller: _continuationController,
+            maxLines: 4,
+            hintText: 'Continue the story in your own words…',
           ),
           const Gap(20),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _submitting ? null : _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _kAccent,
-                elevation: 8,
-                shadowColor: _kAccent.withValues(alpha: 0.4),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: _submitting
-                  ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                  : const Text('Submit Story', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            ),
+          GameSubmitButton(
+            onPressed: _submitting ? null : _submit,
+            label: 'Submit Story',
+            loading: _submitting,
+            accent: _kAccent,
           ),
         ],
       ),
@@ -231,27 +187,11 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   Widget _buildWaiting() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              color: _kAccent.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-              border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
-              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 24)],
-            ),
-            child: const Center(child: Text('✅', style: TextStyle(fontSize: 40))),
-          ),
-          const Gap(20),
-          const Text('Story submitted!', style: TextStyle(color: _kText, fontSize: 22, fontWeight: FontWeight.bold)),
-          const Gap(8),
-          const Text('Waiting for other players…', style: TextStyle(color: _kTextSub)),
-        ],
-      ),
+    return const WaitingPlaceholder(
+      icon: Text('✅', style: TextStyle(fontSize: 40)),
+      title: 'Story submitted!',
+      subtitle: 'Waiting for other players…',
+      accent: _kAccent,
     );
   }
 
@@ -259,7 +199,7 @@ class _BattleScreenState extends State<BattleScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text('Vote for the best story!', style: TextStyle(color: _kText, fontSize: 20, fontWeight: FontWeight.bold)),
+        const Text('Vote for the best story!', style: TextStyle(color: kText, fontSize: 20, fontWeight: FontWeight.bold)),
         const Gap(16),
         for (final entry in _results)
           if (entry.playerId != _myId) ...[
@@ -279,7 +219,7 @@ class _BattleScreenState extends State<BattleScreen> {
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text('🏆 Results', style: TextStyle(color: _kText, fontSize: 24, fontWeight: FontWeight.bold)),
+        const Text('🏆 Results', style: TextStyle(color: kText, fontSize: 24, fontWeight: FontWeight.bold)),
         const Gap(16),
         for (var i = 0; i < _results.length; i++) ...[
           _EntryCard(entry: _results[i], voted: false, canVote: false, rank: i + 1),
@@ -331,44 +271,38 @@ class _EntryCard extends StatelessWidget {
                 ),
               Text(
                 entry.username ?? 'Player',
-                style: const TextStyle(color: Color(0xFFEBF4FF), fontWeight: FontWeight.bold),
+                style: const TextStyle(color: kText, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               if (entry.voteCount > 0)
                 Row(
                   children: [
-                    const Icon(Icons.favorite, color: Color(0xFFFB7185), size: 16),
+                    const Icon(Icons.favorite, color: _kAccent, size: 16),
                     const Gap(4),
-                    Text('${entry.voteCount}', style: const TextStyle(color: Color(0xFF7DB9D8))),
+                    Text('${entry.voteCount}', style: const TextStyle(color: kTextSub)),
                   ],
                 ),
             ],
           ),
           const Gap(8),
           if (entry.story != null) ...[
-            Text(entry.story!.rendered, style: const TextStyle(color: Color(0xFFEBF4FF), height: 1.5)),
+            Text(entry.story!.rendered, style: const TextStyle(color: kText, height: 1.5)),
             const Gap(8),
           ],
           if (entry.continuation != null)
             Text(
               entry.continuation!,
-              style: const TextStyle(color: Color(0xFF7DB9D8), fontStyle: FontStyle.italic, height: 1.4),
+              style: const TextStyle(color: kTextSub, fontStyle: FontStyle.italic, height: 1.4),
             ),
           if (canVote) ...[
             const Gap(12),
-            SizedBox(
-              width: double.infinity,
+            GameSubmitButton(
+              onPressed: onVote,
+              label: 'Vote',
+              accent: _kAccent,
               height: 40,
-              child: ElevatedButton(
-                onPressed: onVote,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFB7185),
-                  elevation: 6,
-                  shadowColor: const Color(0xFFFB7185).withValues(alpha: 0.4),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                child: const Text('Vote', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
+              elevation: 6,
+              borderRadius: 10,
             ),
           ],
         ],
