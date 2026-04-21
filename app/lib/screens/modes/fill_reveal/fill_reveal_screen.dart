@@ -2,19 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../config/app_colors.dart';
 import '../../../models/room.dart';
 import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/blank_input_sheet.dart';
+import '../../../widgets/game_widgets.dart';
 
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFF818CF8);
-
 
 class FillRevealScreen extends StatefulWidget {
   final String roomCode;
@@ -72,7 +68,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     final text = _storyController.text;
     final sel = _storyController.selection;
     final pos = sel.baseOffset < 0 ? text.length : sel.baseOffset;
-    final newText = text.substring(0, pos) + '[ADJ]' + text.substring(pos);
+    final newText = '${text.substring(0, pos)}[ADJ]${text.substring(pos)}';
     _storyController.value = _storyController.value.copyWith(
       text: newText,
       selection: TextSelection.collapsed(offset: pos + 5),
@@ -104,7 +100,6 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     }
   }
 
-
   Future<void> _fillBlank(Story story, StoryBlank blank) async {
     if (blank.isFilled) return;
 
@@ -128,12 +123,12 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        leading: const BackButton(color: _kText),
-        title: const Text('Fill & Reveal', style: TextStyle(color: _kText)),
+        leading: const BackButton(color: kText),
+        title: const Text('Fill & Reveal', style: TextStyle(color: kText)),
         actions: [
           if (_stories.isNotEmpty && _stories.first.isComplete)
             TextButton(
@@ -154,37 +149,13 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   }
 
   Widget _buildWaitingForStory() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: _kAccent.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-                border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
-              ),
-              child: const Center(child: Icon(Icons.edit_note, color: _kAccent, size: 38)),
-            ),
-            const Gap(20),
-            const Text(
-              'Waiting for the story writer…',
-              style: TextStyle(color: _kText, fontSize: 18, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const Gap(8),
-            Text(
-              'The host is writing a story. You\'ll fill in the adjectives once it\'s ready.',
-              style: TextStyle(color: _kTextSub.withValues(alpha: 0.8), fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+    return const WaitingPlaceholder(
+      icon: Icon(Icons.edit_note, color: _kAccent, size: 38),
+      title: 'Waiting for the story writer…',
+      subtitle: 'The host is writing a story. You\'ll fill in the adjectives once it\'s ready.',
+      accent: _kAccent,
+      size: 80,
+      padding: EdgeInsets.all(32),
     );
   }
 
@@ -195,35 +166,22 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Write a story', style: TextStyle(color: _kText, fontSize: 18, fontWeight: FontWeight.bold)),
+          const Text('Write a story', style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.bold)),
           const Gap(8),
           Text(
             _isSolo
                 ? 'Add [ADJ] placeholders — they\'ll be filled with random adjectives when you save.'
                 : 'Use [ADJ] as placeholders for adjectives.\n'
                     '${_otherPlayerCount > 0 ? 'You need at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The [ADJ] cat sat on a [ADJ] mat."'}',
-            style: const TextStyle(color: _kTextSub, fontSize: 14),
+            style: const TextStyle(color: kTextSub, fontSize: 14),
           ),
           const Gap(16),
-          Container(
-            decoration: BoxDecoration(
-              color: _kSurface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _kBorder),
-            ),
-            child: TextField(
-              controller: _storyController,
-              minLines: 8,
-              maxLines: 16,
-              style: const TextStyle(color: _kText),
-              decoration: InputDecoration(
-                hintText: 'Write your story here…',
-                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
-                filled: false,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
+          GameTextField(
+            controller: _storyController,
+            minLines: 8,
+            maxLines: 16,
+            borderRadius: 14,
+            hintText: 'Write your story here…',
           ),
           const Gap(10),
           GestureDetector(
@@ -235,12 +193,12 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(color: _kAccent.withValues(alpha: 0.4)),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.add, size: 14, color: _kAccent),
-                  const Gap(4),
-                  const Text(
+                  Gap(4),
+                  Text(
                     '[ADJ]',
                     style: TextStyle(
                       color: _kAccent,
@@ -254,22 +212,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
             ),
           ),
           const Gap(12),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: _createStory,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _kAccent,
-                elevation: 8,
-                shadowColor: _kAccent.withValues(alpha: 0.4),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              ),
-              child: Text(
-                _isSolo ? 'Save & Fill Randomly' : 'Save Story',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
+          GameSubmitButton(
+            onPressed: _createStory,
+            label: _isSolo ? 'Save & Fill Randomly' : 'Save Story',
+            accent: _kAccent,
           ),
           const Gap(24),
         ],
@@ -300,7 +246,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                     Expanded(
                       child: Text(
                         'You wrote this story. Wait for the other players to fill in the blanks.',
-                        style: TextStyle(color: _kText.withValues(alpha: 0.8), fontSize: 13),
+                        style: TextStyle(color: kText.withValues(alpha: 0.8), fontSize: 13),
                       ),
                     ),
                   ],
@@ -311,13 +257,13 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: _kSurface,
+                color: kSurface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: _kBorder),
+                border: Border.all(color: kBorder),
               ),
               child: Text(
                 story.rendered,
-                style: const TextStyle(color: _kText, fontSize: 16, height: 1.6),
+                style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
               ),
             ),
             const Gap(20),
@@ -325,7 +271,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
               children: [
                 Text(
                   '${story.filledCount}/${story.blanks.length} blanks filled',
-                  style: const TextStyle(color: _kTextSub),
+                  style: const TextStyle(color: kTextSub),
                 ),
                 const Gap(12),
                 Expanded(
@@ -333,7 +279,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: story.blanks.isEmpty ? 0 : story.filledCount / story.blanks.length,
-                      backgroundColor: _kBorder,
+                      backgroundColor: kBorder,
                       color: _kAccent,
                       minHeight: 6,
                     ),
@@ -353,13 +299,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                       duration: const Duration(milliseconds: 160),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: blank.isFilled
-                            ? _kAccent.withValues(alpha: 0.2)
-                            : _kSurface,
+                        color: blank.isFilled ? _kAccent.withValues(alpha: 0.2) : kSurface,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: blank.isFilled ? _kAccent : _kBorder,
-                        ),
+                        border: Border.all(color: blank.isFilled ? _kAccent : kBorder),
                         boxShadow: blank.isFilled
                             ? [BoxShadow(color: _kAccent.withValues(alpha: 0.25), blurRadius: 8)]
                             : [],
@@ -367,7 +309,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                       child: Text(
                         blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
                         style: TextStyle(
-                          color: blank.isFilled ? _kAccent : _kTextSub,
+                          color: blank.isFilled ? _kAccent : kTextSub,
                           fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
@@ -383,16 +325,16 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(
-                      color: blank.isFilled ? _kAccent.withValues(alpha: 0.15) : _kSurface,
+                      color: blank.isFilled ? _kAccent.withValues(alpha: 0.15) : kSurface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: blank.isFilled ? _kAccent.withValues(alpha: 0.5) : _kBorder,
+                        color: blank.isFilled ? _kAccent.withValues(alpha: 0.5) : kBorder,
                       ),
                     ),
                     child: Text(
                       blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
                       style: TextStyle(
-                        color: blank.isFilled ? _kAccent : _kTextSub.withValues(alpha: 0.4),
+                        color: blank.isFilled ? _kAccent : kTextSub.withValues(alpha: 0.4),
                         fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
@@ -403,14 +345,14 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _kSurface,
+                color: kSurface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: _kAccent.withValues(alpha: 0.4)),
                 boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 20)],
               ),
               child: Text(
                 story.rendered,
-                style: const TextStyle(color: _kText, fontSize: 18, height: 1.7),
+                style: const TextStyle(color: kText, fontSize: 18, height: 1.7),
               ),
             ).animate().fadeIn().scale(begin: const Offset(0.95, 0.95)),
           ],
