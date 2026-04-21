@@ -100,6 +100,15 @@ export async function leaveRoom(roomId: string, playerId: string) {
   if (error) throw error;
 }
 
+export async function getPlayerListForRoom(roomId: string): Promise<string[]> {
+  const { data: players } = await supabase
+    .from('room_players')
+    .select('player_id')
+    .eq('room_id', roomId)
+    .order('joined_at');
+  return (players || []).map((p: { player_id: string }) => p.player_id);
+}
+
 export async function startGame(roomId: string, hostId: string) {
   const { data: room, error } = await supabase
     .from('rooms')
