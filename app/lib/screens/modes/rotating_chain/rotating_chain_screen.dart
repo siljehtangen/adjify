@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../../config/app_colors.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
+import '../../../widgets/game_widgets.dart';
 
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
 const _kAccent = Color(0xFF2DD4BF);
 
 class RotatingChainScreen extends StatefulWidget {
@@ -30,7 +25,6 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   bool _submitting = false;
   bool _submitted = false;
 
-  String get _myId => Supabase.instance.client.auth.currentUser!.id;
   bool get _isMyTurn => _turnInfo?['isYourTurn'] == true;
 
   @override
@@ -80,12 +74,12 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        leading: const BackButton(color: _kText),
-        title: const Text('Rotating Chain', style: TextStyle(color: _kText)),
+        leading: const BackButton(color: kText),
+        title: const Text('Rotating Chain', style: TextStyle(color: kText)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: _kAccent))
@@ -99,33 +93,12 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   }
 
   Widget _buildWaiting() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            decoration: BoxDecoration(
-              color: _kAccent.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-              border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
-              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 24, spreadRadius: 2)],
-            ),
-            child: const Center(child: Text('⏳', style: TextStyle(fontSize: 40))),
-          ).animate().scale(),
-          const Gap(20),
-          const Text(
-            'Waiting for your turn…',
-            style: TextStyle(color: _kText, fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const Gap(8),
-          Text(
-            'Round ${_turnInfo?['roundNumber'] ?? '?'}',
-            style: const TextStyle(color: _kTextSub),
-          ),
-        ],
-      ),
+    return WaitingPlaceholder(
+      icon: const Text('⏳', style: TextStyle(fontSize: 40)),
+      title: 'Waiting for your turn…',
+      subtitle: 'Round ${_turnInfo?['roundNumber'] ?? '?'}',
+      accent: _kAccent,
+      animate: true,
     );
   }
 
@@ -154,13 +127,11 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
                 children: [
                   Text(
                     isSentence ? 'Your turn: write a sentence' : 'Your turn: fill the adjective blank',
-                    style: const TextStyle(color: _kText, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: kText, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    isSentence
-                        ? 'Include [ADJ] as a placeholder'
-                        : 'What adjective fits here?',
-                    style: const TextStyle(color: _kTextSub, fontSize: 12),
+                    isSentence ? 'Include [ADJ] as a placeholder' : 'What adjective fits here?',
+                    style: const TextStyle(color: kTextSub, fontSize: 12),
                   ),
                 ],
               ),
@@ -169,60 +140,36 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
         ),
         if (previous != null) ...[
           const Gap(16),
-          const Text('Previous:', style: TextStyle(color: _kTextSub, fontSize: 12)),
+          const Text('Previous:', style: TextStyle(color: kTextSub, fontSize: 12)),
           const Gap(4),
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _kSurface,
+              color: kSurface,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: _kBorder),
+              border: Border.all(color: kBorder),
             ),
-            child: Text(previous, style: const TextStyle(color: _kTextSub, fontStyle: FontStyle.italic)),
+            child: Text(previous, style: const TextStyle(color: kTextSub, fontStyle: FontStyle.italic)),
           ),
         ],
         const Gap(20),
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: _kSurface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _kBorder),
-            ),
-            child: TextField(
-              controller: _controller,
-              maxLines: null,
-              expands: true,
-              autofocus: true,
-              style: const TextStyle(color: _kText),
-              decoration: InputDecoration(
-                hintText: isSentence
-                    ? 'The [ADJ] wizard walked into the [ADJ] forest…'
-                    : 'mysterious, ancient, fluffy…',
-                hintStyle: TextStyle(color: _kTextSub.withValues(alpha: 0.5)),
-                filled: false,
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.all(16),
-              ),
-            ),
+          child: GameTextField(
+            controller: _controller,
+            expands: true,
+            autofocus: true,
+            borderRadius: 14,
+            hintText: isSentence
+                ? 'The [ADJ] wizard walked into the [ADJ] forest…'
+                : 'mysterious, ancient, fluffy…',
           ),
         ),
         const Gap(16),
-        SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: ElevatedButton(
-            onPressed: _submitting ? null : _submit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _kAccent,
-              elevation: 8,
-              shadowColor: _kAccent.withValues(alpha: 0.4),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            ),
-            child: _submitting
-                ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-                : const Text('Submit', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-          ),
+        GameSubmitButton(
+          onPressed: _submitting ? null : _submit,
+          label: 'Submit',
+          loading: _submitting,
+          accent: _kAccent,
         ),
       ],
     );
