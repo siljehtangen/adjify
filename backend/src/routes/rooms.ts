@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { createRoom, getRoomByCode, joinRoom, leaveRoom, startGame } from '../services/roomService.js';
+import { routeError } from '../utils/routeError.js';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
     return res.status(201).json(room);
   } catch (err: any) {
     console.error('[POST /api/rooms]', err);
-    return res.status(500).json({ error: err.message, details: err.details ?? err.hint ?? undefined });
+    return routeError(res, err, 500);
   }
 });
 
@@ -38,7 +39,7 @@ router.post('/:code/join', authenticate, async (req: AuthRequest, res: Response)
     return res.json(room);
   } catch (err: any) {
     console.error('[POST /api/rooms/:code/join]', err);
-    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
+    return routeError(res, err);
   }
 });
 
@@ -49,7 +50,7 @@ router.post('/:code/leave', authenticate, async (req: AuthRequest, res: Response
     return res.json({ success: true });
   } catch (err: any) {
     console.error('[POST /api/rooms/:code/leave]', err);
-    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
+    return routeError(res, err);
   }
 });
 
@@ -60,7 +61,7 @@ router.post('/:code/start', authenticate, async (req: AuthRequest, res: Response
     return res.json(updated);
   } catch (err: any) {
     console.error('[POST /api/rooms/:code/start]', err);
-    return res.status(400).json({ error: err.message, details: err.details ?? undefined });
+    return routeError(res, err);
   }
 });
 
