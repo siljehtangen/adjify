@@ -4,19 +4,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../config/app_colors.dart';
 import '../../models/room.dart';
 import '../../services/auth_service.dart';
-
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
-
-const _kFillReveal = Color(0xFF818CF8);
-const _kChain = Color(0xFF2DD4BF);
-const _kBattle = Color(0xFFFB7185);
-const _kAccent = Color(0xFF38BDF8);
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -26,21 +16,14 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        title: Text(
-          'Adjify',
-          style: GoogleFonts.lora(
-            color: _kAccent,
-            fontWeight: FontWeight.w700,
-            fontSize: 22,
-          ),
-        ),
+        title: Text('Adjify', style: GoogleFonts.lora(color: kAccent, fontWeight: FontWeight.w700, fontSize: 22)),
         actions: [
           IconButton(
-            icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: _kTextSub),
+            icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: kTextSub),
             onPressed: () async {
               await _auth.signOut();
               if (context.mounted) context.go('/login');
@@ -56,23 +39,19 @@ class HomeScreen extends StatelessWidget {
             children: [
               Text(
                 'Choose a mode',
-                style: GoogleFonts.lora(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w700,
-                  color: _kText,
-                ),
+                style: GoogleFonts.lora(fontSize: 26, fontWeight: FontWeight.w700, color: kText),
               ).animate().fadeIn(),
               const Gap(4),
               const Text(
                 'Or join a friend\'s room below',
-                style: TextStyle(color: _kTextSub, fontSize: 14),
+                style: TextStyle(color: kTextSub, fontSize: 14),
               ).animate().fadeIn(delay: 80.ms),
               const Gap(28),
               const _ModeCard(
                 icon: FontAwesomeIcons.bookOpen,
                 title: 'Fill & Reveal',
                 subtitle: 'Fill hidden adjective blanks — solo or with friends',
-                color: _kFillReveal,
+                color: kFillReveal,
                 mode: GameMode.fillReveal,
                 playerLabel: '1 – ★ blanks',
                 delay: 0,
@@ -82,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                 icon: FontAwesomeIcons.arrowsRotate,
                 title: 'Rotating Chain',
                 subtitle: 'Build a chaotic story step-by-step in secret',
-                color: _kChain,
+                color: kChain,
                 mode: GameMode.rotatingChain,
                 playerLabel: '2 – 6 players',
                 delay: 100,
@@ -92,7 +71,7 @@ class HomeScreen extends StatelessWidget {
                 icon: FontAwesomeIcons.trophy,
                 title: 'Adjective Battle',
                 subtitle: 'Compete to make the funniest story from the same prompt',
-                color: _kBattle,
+                color: kBattle,
                 mode: GameMode.battle,
                 playerLabel: '2 – 8 players',
                 delay: 200,
@@ -133,16 +112,10 @@ class _ModeCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: _kSurface,
+          color: kSurface,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: _kBorder),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.15),
-              blurRadius: 20,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          border: Border.all(color: kBorder),
+          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 4))],
         ),
         child: Row(
           children: [
@@ -161,16 +134,9 @@ class _ModeCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: GoogleFonts.lora(
-                      color: _kText,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  Text(title, style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600)),
                   const Gap(3),
-                  Text(subtitle, style: const TextStyle(color: _kTextSub, fontSize: 13)),
+                  Text(subtitle, style: const TextStyle(color: kTextSub, fontSize: 13)),
                   const Gap(6),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -181,17 +147,13 @@ class _ModeCard extends StatelessWidget {
                     ),
                     child: Text(
                       playerLabel,
-                      style: TextStyle(
-                        color: color,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
               ),
             ),
-            FaIcon(FontAwesomeIcons.chevronRight, color: _kBorder.withValues(alpha: 1.0), size: 14),
+            FaIcon(FontAwesomeIcons.chevronRight, color: kBorder.withValues(alpha: 1.0), size: 14),
           ],
         ),
       ),
@@ -214,8 +176,8 @@ class _JoinButton extends StatelessWidget {
           icon: const FaIcon(FontAwesomeIcons.userGroup, size: 16),
           label: const Text('Join a Room'),
           style: OutlinedButton.styleFrom(
-            foregroundColor: _kAccent,
-            side: const BorderSide(color: _kAccent, width: 1.5),
+            foregroundColor: kAccent,
+            side: const BorderSide(color: kAccent, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             textStyle: const TextStyle(fontWeight: FontWeight.w600),
           ),
