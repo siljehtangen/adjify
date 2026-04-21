@@ -65,7 +65,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       setState(() { _submitted = true; _submitting = false; });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        showErrorSnackBar(context, e.toString());
         setState(() => _submitting = false);
       }
     }
