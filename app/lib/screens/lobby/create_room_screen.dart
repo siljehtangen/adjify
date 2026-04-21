@@ -3,14 +3,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../config/app_colors.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
-
-const _kBg = Color(0xFF101D2E);
-const _kSurface = Color(0xFF192C44);
-const _kBorder = Color(0xFF284D6E);
-const _kText = Color(0xFFEBF4FF);
-const _kTextSub = Color(0xFF7DB9D8);
+import '../../widgets/game_widgets.dart';
 
 class CreateRoomScreen extends StatefulWidget {
   final GameMode mode;
@@ -43,16 +39,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       final room = await _api.createRoom(widget.mode, maxPlayers: _maxPlayers);
       if (mounted) context.push('/lobby/${room.code}', extra: room);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: const Color(0xFFFB7185),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      }
+      if (mounted) showErrorSnackBar(context, e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -63,14 +50,14 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
     final color = _modeColor(widget.mode);
 
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
-        backgroundColor: _kBg,
+        backgroundColor: kBg,
         elevation: 0,
-        leading: const BackButton(color: _kText),
+        leading: const BackButton(color: kText),
         title: Text(
           widget.mode.displayName,
-          style: GoogleFonts.lora(color: _kText, fontWeight: FontWeight.w600),
+          style: GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600),
         ),
       ),
       body: Padding(
@@ -82,17 +69,10 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             const Gap(28),
             Text(
               'Number of players',
-              style: GoogleFonts.lora(
-                color: _kText,
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600),
             ),
             const Gap(6),
-            Text(
-              _playerHint(widget.mode),
-              style: const TextStyle(color: _kTextSub, fontSize: 13),
-            ),
+            Text(_playerHint(widget.mode), style: const TextStyle(color: kTextSub, fontSize: 13)),
             const Gap(16),
             Wrap(
               spacing: 10,
@@ -106,12 +86,9 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                     width: 58,
                     height: 58,
                     decoration: BoxDecoration(
-                      color: selected ? color : _kSurface,
+                      color: selected ? color : kSurface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: selected ? color : _kBorder,
-                        width: selected ? 2 : 1.5,
-                      ),
+                      border: Border.all(color: selected ? color : kBorder, width: selected ? 2 : 1.5),
                       boxShadow: selected
                           ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
                           : [],
@@ -121,11 +98,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                           ? Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                FaIcon(
-                                  FontAwesomeIcons.user,
-                                  size: 16,
-                                  color: selected ? Colors.white : color,
-                                ),
+                                FaIcon(FontAwesomeIcons.user, size: 16, color: selected ? Colors.white : color),
                                 const Gap(2),
                                 Text(
                                   'Solo',
@@ -140,7 +113,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                           : Text(
                               '$n',
                               style: TextStyle(
-                                color: selected ? Colors.white : _kText,
+                                color: selected ? Colors.white : kText,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 20,
                               ),
@@ -167,11 +140,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                     ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                     : Text(
                         'Create Room',
-                        style: GoogleFonts.lora(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
+                        style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
                       ),
               ),
             ),
@@ -189,9 +158,9 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       };
 
   Color _modeColor(GameMode mode) => switch (mode) {
-        GameMode.fillReveal => const Color(0xFF818CF8),
-        GameMode.rotatingChain => const Color(0xFF2DD4BF),
-        GameMode.battle => const Color(0xFFFB7185),
+        GameMode.fillReveal => kFillReveal,
+        GameMode.rotatingChain => kChain,
+        GameMode.battle => kBattle,
       };
 }
 
@@ -221,12 +190,10 @@ class _ModeInfoBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: _kSurface,
+        color: kSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: color.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 16, offset: const Offset(0, 4)),
-        ],
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 16, offset: const Offset(0, 4))],
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,9 +209,7 @@ class _ModeInfoBanner extends StatelessWidget {
             child: Center(child: FaIcon(icon, color: color, size: 20)),
           ),
           const Gap(14),
-          Expanded(
-            child: Text(desc, style: const TextStyle(color: _kTextSub, fontSize: 13, height: 1.5)),
-          ),
+          Expanded(child: Text(desc, style: const TextStyle(color: kTextSub, fontSize: 13, height: 1.5))),
         ],
       ),
     );
