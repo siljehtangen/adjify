@@ -32,7 +32,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
     _loadTurn();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on(SocketEvent.chainSubmitted, (_) { setState(() => _submitted = false); _loadTurn(); });
+    _socket.on(SocketEvent.chainSubmitted, (_) { if (mounted) { setState(() => _submitted = false); _loadTurn(); } });
   }
 
   @override
