@@ -1,3 +1,19 @@
+const kAdjPlaceholder = '[ADJ]';
+
+enum SegmentType { sentence, blankFill }
+
+extension SegmentTypeX on SegmentType {
+  String get value => switch (this) {
+        SegmentType.sentence => 'sentence',
+        SegmentType.blankFill => 'blank_fill',
+      };
+
+  static SegmentType fromString(String s) => switch (s) {
+        'blank_fill' => SegmentType.blankFill,
+        _ => SegmentType.sentence,
+      };
+}
+
 class Story {
   final String id;
   final String roomId;
@@ -31,7 +47,7 @@ class Story {
   String get rendered {
     var result = content;
     for (final blank in blanks) {
-      result = result.replaceFirst('[ADJ]', blank.adjective ?? '___');
+      result = result.replaceFirst(kAdjPlaceholder, blank.adjective ?? '___');
     }
     return result;
   }
@@ -67,7 +83,7 @@ class ChainSegment {
   final String id;
   final String roomId;
   final int roundNumber;
-  final String segmentType; // 'sentence' | 'blank_fill'
+  final SegmentType segmentType;
   final String? content;
   final String authorId;
 
@@ -84,7 +100,7 @@ class ChainSegment {
         id: json['id'] as String,
         roomId: json['room_id'] as String,
         roundNumber: json['round_number'] as int,
-        segmentType: json['segment_type'] as String,
+        segmentType: SegmentTypeX.fromString(json['segment_type'] as String),
         content: json['content'] as String?,
         authorId: json['author_id'] as String,
       );
