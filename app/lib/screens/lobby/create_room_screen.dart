@@ -47,7 +47,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final color = _modeColor(widget.mode);
+    final color = widget.mode.color;
 
     return Scaffold(
       backgroundColor: kBg,
@@ -157,11 +157,6 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
         GameMode.battle => 'Min 2, max 8 — everyone fills the same story and votes.',
       };
 
-  Color _modeColor(GameMode mode) => switch (mode) {
-        GameMode.fillReveal => kFillReveal,
-        GameMode.rotatingChain => kChain,
-        GameMode.battle => kBattle,
-      };
 }
 
 class _ModeInfoBanner extends StatelessWidget {
