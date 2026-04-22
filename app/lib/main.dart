@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'config/app_theme.dart';
 import 'config/env.dart';
 import 'router.dart';
 
@@ -23,15 +23,7 @@ class AdjifyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Adjify',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF38BDF8),
-          brightness: Brightness.dark,
-          surface: const Color(0xFF101D2E),
-        ),
-        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.dark,
       routerConfig: router,
     );
   }
