@@ -55,7 +55,7 @@ class GameTextField extends StatelessWidget {
         style: const TextStyle(color: kText),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: Color(0x7F7DB9D8)),
+          hintStyle: const TextStyle(color: kTextHint),
           labelText: labelText,
           labelStyle: const TextStyle(color: kTextSub),
           filled: false,
