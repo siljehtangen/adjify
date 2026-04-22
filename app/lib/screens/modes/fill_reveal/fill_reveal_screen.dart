@@ -3,14 +3,11 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
-import '../../../models/room.dart';
 import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/blank_input_sheet.dart';
 import '../../../widgets/game_widgets.dart';
-
-const _kAccent = Color(0xFF818CF8);
 
 class FillRevealScreen extends StatefulWidget {
   final String roomCode;
@@ -25,15 +22,16 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   final _socket = SocketService();
 
   List<Story> _stories = [];
-  Room? _room;
   bool _loading = true;
   bool _revealed = false;
+  String? _hostId;
+  int? _maxPlayers;
 
   final _storyController = TextEditingController();
   String get _myId => Supabase.instance.client.auth.currentUser!.id;
-  bool get _isHost => _room?.hostId == _myId;
-  bool get _isSolo => (_room?.maxPlayers ?? 2) == 1;
-  int get _otherPlayerCount => (_room?.players.length ?? 1) - 1;
+  bool get _isHost => _hostId == _myId;
+  bool get _isSolo => (_maxPlayers ?? 2) == 1;
+  int get _otherPlayerCount => (_maxPlayers ?? 1) - 1;
 
   @override
   void initState() {
@@ -41,9 +39,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     _load();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on('game:blank_filled', (_) => _load());
-    _socket.on('game:story_revealed', (_) { setState(() => _revealed = true); _load(); });
-    _socket.on('game:story_created', (_) => _load());
+    _socket.on(SocketEvent.blankFilled, (_) => _load());
+    _socket.on(SocketEvent.storyRevealed, (_) { setState(() => _revealed = true); _load(); });
+    _socket.on(SocketEvent.storyCreated, (_) => _load());
   }
 
   @override
@@ -58,7 +56,14 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     try {
       final room = await _api.getRoom(widget.roomCode);
       final stories = await _api.getStories(widget.roomCode);
-      if (mounted) setState(() { _room = room; _stories = stories; _loading = false; });
+      if (mounted) {
+        setState(() {
+          _hostId = room.hostId;
+          _maxPlayers = room.maxPlayers;
+          _stories = stories;
+          _loading = false;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
@@ -68,23 +73,23 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     final text = _storyController.text;
     final sel = _storyController.selection;
     final pos = sel.baseOffset < 0 ? text.length : sel.baseOffset;
-    final newText = '${text.substring(0, pos)}[ADJ]${text.substring(pos)}';
+    final newText = '${text.substring(0, pos)}$kAdjPlaceholder${text.substring(pos)}';
     _storyController.value = _storyController.value.copyWith(
       text: newText,
-      selection: TextSelection.collapsed(offset: pos + 5),
+      selection: TextSelection.collapsed(offset: pos + kAdjPlaceholder.length),
     );
   }
 
   Future<void> _createStory() async {
     final content = _storyController.text.trim();
-    if (content.isEmpty || !content.contains('[ADJ]')) {
-      showErrorSnackBar(context, 'Story must contain at least one [ADJ] placeholder');
+    if (content.isEmpty || !content.contains(kAdjPlaceholder)) {
+      showErrorSnackBar(context, 'Story must contain at least one $kAdjPlaceholder placeholder');
       return;
     }
-    final blankCount = '[ADJ]'.allMatches(content).length;
+    final blankCount = kAdjPlaceholder.allMatches(content).length;
     final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
     if (blankCount < minBlanks) {
-      showErrorSnackBar(context, 'Add at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player');
+      showErrorSnackBar(context, 'Add at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player');
       return;
     }
     try {
@@ -131,13 +136,13 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
               onPressed: () => setState(() => _revealed = !_revealed),
               child: Text(
                 _revealed ? 'Hide' : 'Reveal!',
-                style: const TextStyle(color: _kAccent, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: kFillReveal, fontWeight: FontWeight.bold),
               ),
             ),
         ],
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: _kAccent))
+          ? const Center(child: CircularProgressIndicator(color: kFillReveal))
           : _stories.isEmpty
               ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
               : _buildGameView(),
@@ -146,10 +151,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
 
   Widget _buildWaitingForStory() {
     return const WaitingPlaceholder(
-      icon: Icon(Icons.edit_note, color: _kAccent, size: 38),
+      icon: Icon(Icons.edit_note, color: kFillReveal, size: 38),
       title: 'Waiting for the story writer…',
       subtitle: 'The host is writing a story. You\'ll fill in the adjectives once it\'s ready.',
-      accent: _kAccent,
+      accent: kFillReveal,
       size: 80,
       padding: EdgeInsets.all(32),
     );
@@ -166,9 +171,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
           const Gap(8),
           Text(
             _isSolo
-                ? 'Add [ADJ] placeholders — they\'ll be filled with random adjectives when you save.'
-                : 'Use [ADJ] as placeholders for adjectives.\n'
-                    '${_otherPlayerCount > 0 ? 'You need at least $minBlanks [ADJ] blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The [ADJ] cat sat on a [ADJ] mat."'}',
+                ? 'Add $kAdjPlaceholder placeholders — they\'ll be filled with random adjectives when you save.'
+                : 'Use $kAdjPlaceholder as placeholders for adjectives.\n'
+                    '${_otherPlayerCount > 0 ? 'You need at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The $kAdjPlaceholder cat sat on a $kAdjPlaceholder mat."'}',
             style: const TextStyle(color: kTextSub, fontSize: 14),
           ),
           const Gap(16),
@@ -185,19 +190,19 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
               decoration: BoxDecoration(
-                color: _kAccent.withValues(alpha: 0.1),
+                color: kFillReveal.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: _kAccent.withValues(alpha: 0.4)),
+                border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
               ),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.add, size: 14, color: _kAccent),
+                  Icon(Icons.add, size: 14, color: kFillReveal),
                   Gap(4),
                   Text(
-                    '[ADJ]',
+                    kAdjPlaceholder,
                     style: TextStyle(
-                      color: _kAccent,
+                      color: kFillReveal,
                       fontWeight: FontWeight.bold,
                       fontFamily: 'monospace',
                       fontSize: 13,
@@ -211,7 +216,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
           GameSubmitButton(
             onPressed: _createStory,
             label: _isSolo ? 'Save & Fill Randomly' : 'Save Story',
-            accent: _kAccent,
+            accent: kFillReveal,
           ),
           const Gap(24),
         ],
@@ -227,133 +232,151 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!_revealed) ...[
-            if (_isHost && !_isSolo) ...[
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: _kAccent.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _kAccent.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline, color: _kAccent, size: 18),
-                    const Gap(10),
-                    Expanded(
-                      child: Text(
-                        'You wrote this story. Wait for the other players to fill in the blanks.',
-                        style: TextStyle(color: kText.withValues(alpha: 0.8), fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Gap(16),
-            ],
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: kSurface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: kBorder),
-              ),
-              child: Text(
-                story.rendered,
-                style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
-              ),
-            ),
-            const Gap(20),
-            Row(
-              children: [
-                Text(
-                  '${story.filledCount}/${story.blanks.length} blanks filled',
-                  style: const TextStyle(color: kTextSub),
-                ),
-                const Gap(12),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: story.blanks.isEmpty ? 0 : story.filledCount / story.blanks.length,
-                      backgroundColor: kBorder,
-                      color: _kAccent,
-                      minHeight: 6,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const Gap(16),
-            if (!_isHost || _isSolo)
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: story.blanks.map((blank) {
-                  return GestureDetector(
-                    onTap: () => _fillBlank(story, blank),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 160),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: blank.isFilled ? _kAccent.withValues(alpha: 0.2) : kSurface,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: blank.isFilled ? _kAccent : kBorder),
-                        boxShadow: blank.isFilled
-                            ? [BoxShadow(color: _kAccent.withValues(alpha: 0.25), blurRadius: 8)]
-                            : [],
-                      ),
-                      child: Text(
-                        blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
-                        style: TextStyle(
-                          color: blank.isFilled ? _kAccent : kTextSub,
-                          fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              )
-            else
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: story.blanks.map((blank) {
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: blank.isFilled ? _kAccent.withValues(alpha: 0.15) : kSurface,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: blank.isFilled ? _kAccent.withValues(alpha: 0.5) : kBorder,
-                      ),
-                    ),
-                    child: Text(
-                      blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
-                      style: TextStyle(
-                        color: blank.isFilled ? _kAccent : kTextSub.withValues(alpha: 0.4),
-                        fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
+            _buildFillingView(story),
           ] else ...[
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: kSurface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: _kAccent.withValues(alpha: 0.4)),
-                boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.15), blurRadius: 20)],
-              ),
-              child: Text(
-                story.rendered,
-                style: const TextStyle(color: kText, fontSize: 18, height: 1.7),
-              ),
-            ).animate().fadeIn().scale(begin: const Offset(0.95, 0.95)),
+            _buildRevealedView(story),
           ],
         ],
       ),
     );
+  }
+
+  Widget _buildFillingView(Story story) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_isHost && !_isSolo) ...[
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: kFillReveal.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kFillReveal.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: kFillReveal, size: 18),
+                const Gap(10),
+                Expanded(
+                  child: Text(
+                    'You wrote this story. Wait for the other players to fill in the blanks.',
+                    style: TextStyle(color: kText.withValues(alpha: 0.8), fontSize: 13),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Gap(16),
+        ],
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: kSurface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: kBorder),
+          ),
+          child: Text(
+            story.rendered,
+            style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
+          ),
+        ),
+        const Gap(20),
+        Row(
+          children: [
+            Text(
+              '${story.filledCount}/${story.blanks.length} blanks filled',
+              style: const TextStyle(color: kTextSub),
+            ),
+            const Gap(12),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: story.blanks.isEmpty ? 0 : story.filledCount / story.blanks.length,
+                  backgroundColor: kBorder,
+                  color: kFillReveal,
+                  minHeight: 6,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const Gap(16),
+        _buildBlanks(story),
+      ],
+    );
+  }
+
+  Widget _buildBlanks(Story story) {
+    if (!_isHost || _isSolo) {
+      return Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: story.blanks.map((blank) {
+          return GestureDetector(
+            onTap: () => _fillBlank(story, blank),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                color: blank.isFilled ? kFillReveal.withValues(alpha: 0.2) : kSurface,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: blank.isFilled ? kFillReveal : kBorder),
+                boxShadow: blank.isFilled
+                    ? [BoxShadow(color: kFillReveal.withValues(alpha: 0.25), blurRadius: 8)]
+                    : [],
+              ),
+              child: Text(
+                blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
+                style: TextStyle(
+                  color: blank.isFilled ? kFillReveal : kTextSub,
+                  fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: story.blanks.map((blank) {
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: blank.isFilled ? kFillReveal.withValues(alpha: 0.15) : kSurface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: blank.isFilled ? kFillReveal.withValues(alpha: 0.5) : kBorder,
+            ),
+          ),
+          child: Text(
+            blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
+            style: TextStyle(
+              color: blank.isFilled ? kFillReveal : kTextSub.withValues(alpha: 0.4),
+              fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildRevealedView(Story story) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: kSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
+        boxShadow: [BoxShadow(color: kFillReveal.withValues(alpha: 0.15), blurRadius: 20)],
+      ),
+      child: Text(
+        story.rendered,
+        style: const TextStyle(color: kText, fontSize: 18, height: 1.7),
+      ),
+    ).animate().fadeIn().scale(begin: const Offset(0.95, 0.95));
   }
 }

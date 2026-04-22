@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
+import '../../../models/story.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/game_widgets.dart';
-
-const _kAccent = Color(0xFF2DD4BF);
 
 class RotatingChainScreen extends StatefulWidget {
   final String roomCode;
@@ -33,7 +32,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
     _loadTurn();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on('game:chain_submitted', (_) { setState(() => _submitted = false); _loadTurn(); });
+    _socket.on(SocketEvent.chainSubmitted, (_) { setState(() => _submitted = false); _loadTurn(); });
   }
 
   @override
@@ -59,7 +58,8 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
 
     setState(() => _submitting = true);
     try {
-      final type = _turnInfo!['segmentType'] as String;
+      final typeStr = _turnInfo!['segmentType'] as String? ?? 'sentence';
+      final type = SegmentTypeX.fromString(typeStr);
       await _api.submitChainSegment(widget.roomCode, type, content);
       _controller.clear();
       setState(() { _submitted = true; _submitting = false; });
@@ -82,7 +82,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
         title: const Text('Rotating Chain', style: TextStyle(color: kText)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: _kAccent))
+          ? const Center(child: CircularProgressIndicator(color: kChain))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: _isMyTurn && !_submitted
@@ -97,15 +97,16 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       icon: const Text('⏳', style: TextStyle(fontSize: 40)),
       title: 'Waiting for your turn…',
       subtitle: 'Round ${_turnInfo?['roundNumber'] ?? '?'}',
-      accent: _kAccent,
+      accent: kChain,
       animate: true,
     );
   }
 
   Widget _buildMyTurn() {
-    final type = _turnInfo?['segmentType'] as String? ?? 'sentence';
+    final typeStr = _turnInfo?['segmentType'] as String? ?? 'sentence';
+    final type = SegmentTypeX.fromString(typeStr);
     final previous = _turnInfo?['previousContent'] as String?;
-    final isSentence = type == 'sentence';
+    final isSentence = type == SegmentType.sentence;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,10 +114,10 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _kAccent.withValues(alpha: 0.1),
+            color: kChain.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: _kAccent.withValues(alpha: 0.35)),
-            boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.1), blurRadius: 16)],
+            border: Border.all(color: kChain.withValues(alpha: 0.35)),
+            boxShadow: [BoxShadow(color: kChain.withValues(alpha: 0.1), blurRadius: 16)],
           ),
           child: Row(
             children: [
@@ -130,7 +131,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
                     style: const TextStyle(color: kText, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    isSentence ? 'Include [ADJ] as a placeholder' : 'What adjective fits here?',
+                    isSentence ? 'Include $kAdjPlaceholder as a placeholder' : 'What adjective fits here?',
                     style: const TextStyle(color: kTextSub, fontSize: 12),
                   ),
                 ],
@@ -160,7 +161,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
             autofocus: true,
             borderRadius: 14,
             hintText: isSentence
-                ? 'The [ADJ] wizard walked into the [ADJ] forest…'
+                ? 'The $kAdjPlaceholder wizard walked into the $kAdjPlaceholder forest…'
                 : 'mysterious, ancient, fluffy…',
           ),
         ),
@@ -169,7 +170,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
           onPressed: _submitting ? null : _submit,
           label: 'Submit',
           loading: _submitting,
-          accent: _kAccent,
+          accent: kChain,
         ),
       ],
     );
