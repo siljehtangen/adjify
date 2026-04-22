@@ -62,7 +62,8 @@ export async function castVote(roomId: string, voterId: string, entryId: string)
   if (error) throw error;
 
   // Increment vote count
-  const { data } = await supabase.rpc('increment_vote', { entry_id: entryId });
+  const { data, error: rpcError } = await supabase.rpc('increment_vote', { entry_id: entryId });
+  if (rpcError) throw rpcError;
   return data;
 }
 
