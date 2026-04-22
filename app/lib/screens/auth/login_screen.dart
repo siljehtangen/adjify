@@ -35,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [kBg, Color(0xFF172938), Color(0xFF1B3050)],
+            colors: [kBg, kGradMid, kGradEnd],
           ),
         ),
         child: SafeArea(
@@ -83,21 +83,21 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF060F1E)),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: kNight),
                             )
                           : Image.asset(
                               'assets/images/google_logo.png',
                               width: 20,
                               height: 20,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.login, color: Color(0xFF060F1E)),
+                              errorBuilder: (_, __, ___) => const Icon(Icons.login, color: kNight),
                             ),
                       label: Text(
                         _loading ? 'Signing in…' : 'Continue with Google',
-                        style: const TextStyle(color: Color(0xFF060F1E), fontWeight: FontWeight.w700, fontSize: 16),
+                        style: const TextStyle(color: kNight, fontWeight: FontWeight.w700, fontSize: 16),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: kAccent,
-                        foregroundColor: const Color(0xFF060F1E),
+                        foregroundColor: kNight,
                         elevation: 8,
                         shadowColor: kAccent.withValues(alpha: 0.5),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
