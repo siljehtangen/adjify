@@ -39,8 +39,8 @@ class _BattleScreenState extends State<BattleScreen> {
     _loadPrompt();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on(SocketEvent.battleReveal, (_) { setState(() => _phase = BattlePhase.voting); _loadResults(); });
-    _socket.on(SocketEvent.voteCast, (_) => _loadResults());
+    _socket.on(SocketEvent.battleReveal, (_) { if (mounted) { setState(() => _phase = BattlePhase.voting); _loadResults(); } });
+    _socket.on(SocketEvent.voteCast, (_) { if (mounted) _loadResults(); });
   }
 
   @override
