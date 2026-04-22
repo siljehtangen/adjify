@@ -20,8 +20,10 @@ class ApiService {
     };
   }
 
+  static const _timeout = Duration(seconds: 15);
+
   Future<T> _get<T>(String path, T Function(dynamic) parse) async {
-    final res = await http.get(Uri.parse('$_base$path'), headers: _headers);
+    final res = await http.get(Uri.parse('$_base$path'), headers: _headers).timeout(_timeout);
     _assertOk(res);
     return parse(jsonDecode(res.body));
   }
@@ -31,7 +33,7 @@ class ApiService {
       Uri.parse('$_base$path'),
       headers: _headers,
       body: jsonEncode(body),
-    );
+    ).timeout(_timeout);
     _assertOk(res);
     return parse(jsonDecode(res.body));
   }
@@ -41,8 +43,12 @@ class ApiService {
 
   void _assertOk(http.Response res) {
     if (res.statusCode >= 400) {
-      final body = jsonDecode(res.body);
-      throw ApiException(body['error']?.toString() ?? 'Unknown error', res.statusCode);
+      String message = 'Unknown error';
+      try {
+        final body = jsonDecode(res.body) as Map<String, dynamic>;
+        message = body['error']?.toString() ?? message;
+      } catch (_) {}
+      throw ApiException(message, res.statusCode);
     }
   }
 
