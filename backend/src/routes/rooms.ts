@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { createRoom, getRoomByCode, joinRoom, leaveRoom, startGame } from '../services/roomService.js';
 import { routeError } from '../utils/routeError.js';
+import { emitToRoom } from '../services/socketService.js';
 
 const router = Router();
 
@@ -58,6 +59,7 @@ router.post('/:code/start', authenticate, async (req: AuthRequest, res: Response
   try {
     const room = await getRoomByCode(req.params.code);
     const updated = await startGame(room.id, req.user!.id);
+    emitToRoom(req.io, req.params.code, 'room:game_started', updated);
     return res.json(updated);
   } catch (err: any) {
     console.error('[POST /api/rooms/:code/start]', err);

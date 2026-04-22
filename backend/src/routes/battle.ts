@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode } from '../services/roomService.js';
 import { routeError } from '../utils/routeError.js';
+import { emitToRoom } from '../services/socketService.js';
 import {
   submitBattleEntry,
   castVote,
@@ -48,6 +49,8 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
   try {
     const room = await getRoomByCode(req.params.code);
+    const isMember = room.room_players.some((p: { player_id: string }) => p.player_id === req.user!.id);
+    if (!isMember) return res.status(403).json({ error: 'Not a member of this room' });
 
     // Create a personal copy of the story for this player
     const { data: template } = await supabase
@@ -83,6 +86,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
         .from('rooms')
         .update({ status: 'in_progress' }) // stays in_progress until voting is done
         .eq('id', room.id);
+      emitToRoom(req.io, req.params.code, 'game:battle_reveal', {});
     }
 
     return res.status(201).json({ entry, allSubmitted: done });
@@ -99,6 +103,7 @@ router.post('/vote', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const room = await getRoomByCode(req.params.code);
     await castVote(room.id, req.user!.id, parsed.data.entryId);
+    emitToRoom(req.io, req.params.code, 'game:vote_cast', { entryId: parsed.data.entryId });
     return res.json({ success: true });
   } catch (err: any) {
     return routeError(res, err);

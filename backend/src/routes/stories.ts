@@ -5,6 +5,7 @@ import { getRoomByCode } from '../services/roomService.js';
 import { countBlanks, createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
 import { supabase } from '../config/supabase.js';
 import { routeError } from '../utils/routeError.js';
+import { emitToRoom } from '../services/socketService.js';
 
 const router = Router({ mergeParams: true });
 
@@ -35,6 +36,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
     }
 
     const story = await createStory(room.id, parsed.data.content, req.user!.id);
+    emitToRoom(req.io, req.params.code, 'game:story_created', {});
     return res.status(201).json(story);
   } catch (err: any) {
     return routeError(res, err);
@@ -78,6 +80,8 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
       parsed.data.adjective,
       req.user!.id
     );
+    emitToRoom(req.io, req.params.code, 'game:blank_filled', {});
+    if (result.isComplete) emitToRoom(req.io, req.params.code, 'game:story_revealed', {});
     return res.json(result);
   } catch (err: any) {
     return routeError(res, err);

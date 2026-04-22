@@ -4,6 +4,7 @@ import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode, getPlayerListForRoom } from '../services/roomService.js';
 import { addChainSegment, getChainSegments, getLastSegment, getNextPlayer } from '../services/chainService.js';
 import { routeError } from '../utils/routeError.js';
+import { emitToRoom } from '../services/socketService.js';
 
 const router = Router({ mergeParams: true });
 
@@ -51,10 +52,14 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
   try {
     const room = await getRoomByCode(req.params.code);
+    const playerIds = await getPlayerListForRoom(room.id);
+
+    if (!playerIds.includes(req.user!.id)) {
+      return res.status(403).json({ error: 'Not a member of this room' });
+    }
 
     // Verify it's the requester's turn
     const last = await getLastSegment(room.id);
-    const playerIds = await getPlayerListForRoom(room.id);
     const expected = getNextPlayer(playerIds, last?.author_id ?? null, last?.round_number ?? 0);
 
     if (expected !== req.user!.id) {
@@ -68,6 +73,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
       parsed.data.content
     );
 
+    emitToRoom(req.io, req.params.code, 'game:chain_submitted', { segment });
     return res.status(201).json(segment);
   } catch (err: any) {
     return routeError(res, err);
