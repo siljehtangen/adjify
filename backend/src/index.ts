@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request } from 'express';
 import cors from 'cors';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -8,6 +8,14 @@ import storiesRouter from './routes/stories.js';
 import chainRouter from './routes/chain.js';
 import battleRouter from './routes/battle.js';
 import { setupSockets } from './services/socketService.js';
+
+declare global {
+  namespace Express {
+    interface Request {
+      io: Server;
+    }
+  }
+}
 
 const app = express();
 const httpServer = createServer(app);
@@ -25,7 +33,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 
 // Attach io instance to requests so routes can emit events
-app.use((req: any, _res, next) => {
+app.use((req: Request, _res, next) => {
   req.io = io;
   next();
 });
@@ -42,6 +50,11 @@ setupSockets(io);
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.log(`Adjify backend running on port ${PORT}`);
+});
+
+httpServer.on('error', (err) => {
+  console.error('[server] Failed to start:', err.message);
+  process.exit(1);
 });
 
 export { io };
