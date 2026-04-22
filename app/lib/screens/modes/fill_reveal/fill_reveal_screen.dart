@@ -39,9 +39,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
     _load();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on(SocketEvent.blankFilled, (_) => _load());
-    _socket.on(SocketEvent.storyRevealed, (_) { setState(() => _revealed = true); _load(); });
-    _socket.on(SocketEvent.storyCreated, (_) => _load());
+    _socket.on(SocketEvent.blankFilled, (_) { if (mounted) _load(); });
+    _socket.on(SocketEvent.storyRevealed, (_) { if (mounted) { setState(() => _revealed = true); _load(); } });
+    _socket.on(SocketEvent.storyCreated, (_) { if (mounted) _load(); });
   }
 
   @override
