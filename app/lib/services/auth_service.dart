@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
+  factory AuthService() => _instance;
+  static final _instance = AuthService._();
+  AuthService._();
+
   final _client = Supabase.instance.client;
 
   User? get currentUser => _client.auth.currentUser;

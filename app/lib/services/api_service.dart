@@ -6,6 +6,10 @@ import '../models/room.dart';
 import '../models/story.dart';
 
 class ApiService {
+  factory ApiService() => _instance;
+  static final _instance = ApiService._();
+  ApiService._();
+
   final String _base = Env.apiUrl;
 
   Map<String, String> get _headers {
@@ -78,8 +82,8 @@ class ApiService {
   Future<Map<String, dynamic>> getChainTurn(String roomCode) =>
       _get('/api/rooms/$roomCode/chain/turn', (j) => j as Map<String, dynamic>);
 
-  Future<ChainSegment> submitChainSegment(String roomCode, String segmentType, String content) =>
-      _post('/api/rooms/$roomCode/chain/submit', {'segmentType': segmentType, 'content': content}, _wrap(ChainSegment.fromJson));
+  Future<ChainSegment> submitChainSegment(String roomCode, SegmentType segmentType, String content) =>
+      _post('/api/rooms/$roomCode/chain/submit', {'segmentType': segmentType.value, 'content': content}, _wrap(ChainSegment.fromJson));
 
   // Battle (mode 3)
   Future<Map<String, dynamic>> getBattlePrompt(String roomCode) =>

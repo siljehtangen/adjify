@@ -2,6 +2,25 @@ import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../config/env.dart';
 
+abstract final class SocketEvent {
+  // Lobby
+  static const playerJoined = 'room:player_joined';
+  static const playerLeft = 'room:player_left';
+  static const gameStarted = 'room:game_started';
+
+  // Fill & Reveal
+  static const blankFilled = 'game:blank_filled';
+  static const storyRevealed = 'game:story_revealed';
+  static const storyCreated = 'game:story_created';
+
+  // Rotating Chain
+  static const chainSubmitted = 'game:chain_submitted';
+
+  // Battle
+  static const battleReveal = 'game:battle_reveal';
+  static const voteCast = 'game:vote_cast';
+}
+
 class SocketService {
   io.Socket? _socket;
 
@@ -24,10 +43,6 @@ class SocketService {
           .enableAutoConnect()
           .build(),
     );
-
-    _socket!.onConnect((_) {});
-    _socket!.onDisconnect((_) {});
-    _socket!.onError((_) {});
   }
 
   void joinRoom(String roomCode) {
