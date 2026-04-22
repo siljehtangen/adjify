@@ -32,7 +32,7 @@ export async function createRoom(hostId: string, mode: GameMode, maxPlayers: num
 
   // Ensure unique code
   while (attempts < 5) {
-    const { data } = await supabase.from('rooms').select('id').eq('code', code).single();
+    const { data } = await supabase.from('rooms').select('id').eq('code', code).maybeSingle();
     if (!data) break;
     code = generateRoomCode();
     attempts++;
@@ -75,7 +75,6 @@ export async function joinRoom(code: string, playerId: string) {
   await ensureProfile(playerId);
   const room = await getRoomByCode(code);
 
-  if (!room) throw new Error('Room not found');
   if (room.status !== 'waiting') throw new Error('Game already started');
   if (room.room_players.length >= room.max_players) throw new Error('Room is full');
 

@@ -24,7 +24,10 @@ export async function createStory(roomId: string, content: string, createdBy: st
     }));
 
     const { error: blankError } = await supabase.from('story_blanks').insert(blanks);
-    if (blankError) throw blankError;
+    if (blankError) {
+      await supabase.from('stories').delete().eq('id', story.id);
+      throw blankError;
+    }
   }
 
   return story as Story;

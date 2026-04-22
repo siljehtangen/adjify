@@ -60,8 +60,13 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     const playerStory = await createStory(room.id, template.content, req.user!.id);
 
-    for (const blank of parsed.data.filledBlanks) {
-      await fillBlank(playerStory.id, blank.position, blank.adjective, req.user!.id);
+    try {
+      for (const blank of parsed.data.filledBlanks) {
+        await fillBlank(playerStory.id, blank.position, blank.adjective, req.user!.id);
+      }
+    } catch (fillErr) {
+      await supabase.from('stories').delete().eq('id', playerStory.id);
+      throw fillErr;
     }
 
     const entry = await submitBattleEntry(

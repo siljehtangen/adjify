@@ -25,7 +25,7 @@ class SocketService {
   io.Socket? _socket;
 
   io.Socket get socket {
-    assert(_socket != null, 'Call connect() before using the socket');
+    if (_socket == null) throw StateError('Call connect() before using the socket');
     return _socket!;
   }
 

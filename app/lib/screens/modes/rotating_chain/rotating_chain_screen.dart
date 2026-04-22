@@ -23,6 +23,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   bool _loading = true;
   bool _submitting = false;
   bool _submitted = false;
+  String? _error;
 
   bool get _isMyTurn => _turnInfo?['isYourTurn'] == true;
 
@@ -44,11 +45,12 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
   }
 
   Future<void> _loadTurn() async {
+    if (mounted) setState(() => _error = null);
     try {
       final info = await _api.getChainTurn(widget.roomCode);
       if (mounted) setState(() { _turnInfo = info; _loading = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load turn'; });
     }
   }
 
@@ -83,6 +85,12 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kChain))
+          : _error != null
+              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_error!, style: const TextStyle(color: kTextSub)),
+                  const Gap(12),
+                  TextButton(onPressed: _loadTurn, child: const Text('Retry', style: TextStyle(color: kChain))),
+                ]))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: _isMyTurn && !_submitted

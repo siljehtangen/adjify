@@ -25,8 +25,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
   Room? _room;
   bool _loading = true;
   bool _starting = false;
+  String? _error;
 
-  String get _myId => Supabase.instance.client.auth.currentUser!.id;
+  String get _myId => Supabase.instance.client.auth.currentUser?.id ?? '';
   bool get _isHost => _room?.hostId == _myId;
 
   @override
@@ -48,11 +49,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
   }
 
   Future<void> _loadRoom() async {
+    if (mounted) setState(() => _error = null);
     try {
       final room = await _api.getRoom(widget.roomCode);
       if (mounted) setState(() { _room = room; _loading = false; });
     } catch (e) {
-      if (mounted) setState(() => _loading = false);
+      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load room'; });
     }
   }
 
@@ -97,6 +99,12 @@ class _LobbyScreenState extends State<LobbyScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kAccent))
+          : _error != null
+              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_error!, style: const TextStyle(color: kTextSub)),
+                  const Gap(12),
+                  TextButton(onPressed: _loadRoom, child: const Text('Retry', style: TextStyle(color: kAccent))),
+                ]))
           : Padding(
               padding: const EdgeInsets.all(24),
               child: Column(

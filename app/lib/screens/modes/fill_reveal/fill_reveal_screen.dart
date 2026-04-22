@@ -26,9 +26,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   bool _revealed = false;
   String? _hostId;
   int? _maxPlayers;
+  String? _error;
 
   final _storyController = TextEditingController();
-  String get _myId => Supabase.instance.client.auth.currentUser!.id;
+  String get _myId => Supabase.instance.client.auth.currentUser?.id ?? '';
   bool get _isHost => _hostId == _myId;
   bool get _isSolo => (_maxPlayers ?? 2) == 1;
   int get _otherPlayerCount => (_maxPlayers ?? 1) - 1;
@@ -53,6 +54,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   }
 
   Future<void> _load() async {
+    if (mounted) setState(() => _error = null);
     try {
       final room = await _api.getRoom(widget.roomCode);
       final stories = await _api.getStories(widget.roomCode);
@@ -64,8 +66,8 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
           _loading = false;
         });
       }
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load game'; });
     }
   }
 
@@ -114,8 +116,8 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
 
     try {
       final result = await _api.fillBlank(widget.roomCode, story.id, blank.position, adjective);
-      _load();
-      if (result['isComplete'] == true) setState(() => _revealed = true);
+      await _load();
+      if (result['isComplete'] == true && mounted) setState(() => _revealed = true);
     } catch (e) {
       if (mounted) showErrorSnackBar(context, e.toString());
     }
@@ -143,6 +145,12 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kFillReveal))
+          : _error != null
+              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_error!, style: const TextStyle(color: kTextSub)),
+                  const Gap(12),
+                  TextButton(onPressed: _load, child: const Text('Retry', style: TextStyle(color: kFillReveal))),
+                ]))
           : _stories.isEmpty
               ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
               : _buildGameView(),

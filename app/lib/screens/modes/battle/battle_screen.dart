@@ -30,8 +30,9 @@ class _BattleScreenState extends State<BattleScreen> {
   bool _loading = true;
   bool _submitting = false;
   String? _votedEntryId;
+  String? _error;
 
-  String get _myId => Supabase.instance.client.auth.currentUser!.id;
+  String get _myId => Supabase.instance.client.auth.currentUser?.id ?? '';
 
   @override
   void initState() {
@@ -53,6 +54,7 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   Future<void> _loadPrompt() async {
+    if (mounted) setState(() => _error = null);
     try {
       final prompt = await _api.getBattlePrompt(widget.roomCode);
       final blanks = (prompt['story_blanks'] as List?)?.length ?? 0;
@@ -60,8 +62,8 @@ class _BattleScreenState extends State<BattleScreen> {
         _adjectives[i] = TextEditingController();
       }
       if (mounted) setState(() { _prompt = prompt; _loading = false; });
-    } catch (_) {
-      if (mounted) setState(() => _loading = false);
+    } catch (e) {
+      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load prompt'; });
     }
   }
 
@@ -73,6 +75,7 @@ class _BattleScreenState extends State<BattleScreen> {
   }
 
   Future<void> _submit() async {
+    if (_prompt == null) return;
     final continuation = _continuationController.text.trim();
     if (continuation.isEmpty) return;
 
@@ -125,6 +128,12 @@ class _BattleScreenState extends State<BattleScreen> {
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kBattle))
+          : _error != null
+              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  Text(_error!, style: const TextStyle(color: kTextSub)),
+                  const Gap(12),
+                  TextButton(onPressed: _loadPrompt, child: const Text('Retry', style: TextStyle(color: kBattle))),
+                ]))
           : switch (_phase) {
               BattlePhase.filling => _buildFilling(),
               BattlePhase.waiting => _buildWaiting(),
