@@ -8,8 +8,6 @@ import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/game_widgets.dart';
 
-const _kAccent = Color(0xFFFB7185);
-
 enum BattlePhase { filling, waiting, voting, results }
 
 class BattleScreen extends StatefulWidget {
@@ -41,9 +39,8 @@ class _BattleScreenState extends State<BattleScreen> {
     _loadPrompt();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on('game:battle_submitted', (_) {});
-    _socket.on('game:battle_reveal', (_) { setState(() => _phase = BattlePhase.voting); _loadResults(); });
-    _socket.on('game:vote_cast', (_) => _loadResults());
+    _socket.on(SocketEvent.battleReveal, (_) { setState(() => _phase = BattlePhase.voting); _loadResults(); });
+    _socket.on(SocketEvent.voteCast, (_) => _loadResults());
   }
 
   @override
@@ -127,7 +124,7 @@ class _BattleScreenState extends State<BattleScreen> {
         title: const Text('Adjective Battle', style: TextStyle(color: kText)),
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator(color: _kAccent))
+          ? const Center(child: CircularProgressIndicator(color: kBattle))
           : switch (_phase) {
               BattlePhase.filling => _buildFilling(),
               BattlePhase.waiting => _buildWaiting(),
@@ -151,11 +148,11 @@ class _BattleScreenState extends State<BattleScreen> {
             decoration: BoxDecoration(
               color: kSurface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: _kAccent.withValues(alpha: 0.35)),
-              boxShadow: [BoxShadow(color: _kAccent.withValues(alpha: 0.1), blurRadius: 16)],
+              border: Border.all(color: kBattle.withValues(alpha: 0.35)),
+              boxShadow: [BoxShadow(color: kBattle.withValues(alpha: 0.1), blurRadius: 16)],
             ),
             child: Text(
-              content.replaceAll('[ADJ]', '______'),
+              content.replaceAll(kAdjPlaceholder, '______'),
               style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
             ),
           ),
@@ -179,7 +176,7 @@ class _BattleScreenState extends State<BattleScreen> {
             onPressed: _submitting ? null : _submit,
             label: 'Submit Story',
             loading: _submitting,
-            accent: _kAccent,
+            accent: kBattle,
           ),
         ],
       ),
@@ -191,7 +188,7 @@ class _BattleScreenState extends State<BattleScreen> {
       icon: Text('✅', style: TextStyle(fontSize: 40)),
       title: 'Story submitted!',
       subtitle: 'Waiting for other players…',
-      accent: _kAccent,
+      accent: kBattle,
     );
   }
 
@@ -250,13 +247,13 @@ class _EntryCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: voted ? const Color(0xFFFB7185).withValues(alpha: 0.12) : const Color(0xFF0B1D35),
+        color: voted ? kBattle.withValues(alpha: 0.12) : kCardDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: voted ? const Color(0xFFFB7185).withValues(alpha: 0.4) : const Color(0xFF1A3A5C),
+          color: voted ? kBattle.withValues(alpha: 0.4) : kBorderDeep,
         ),
         boxShadow: voted
-            ? [BoxShadow(color: const Color(0xFFFB7185).withValues(alpha: 0.15), blurRadius: 16)]
+            ? [BoxShadow(color: kBattle.withValues(alpha: 0.15), blurRadius: 16)]
             : [],
       ),
       child: Column(
@@ -267,7 +264,7 @@ class _EntryCard extends StatelessWidget {
               if (rank != null)
                 Text(
                   '#$rank ',
-                  style: const TextStyle(color: Color(0xFFFBBF24), fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(color: kGold, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               Text(
                 entry.username ?? 'Player',
@@ -277,7 +274,7 @@ class _EntryCard extends StatelessWidget {
               if (entry.voteCount > 0)
                 Row(
                   children: [
-                    const Icon(Icons.favorite, color: _kAccent, size: 16),
+                    const Icon(Icons.favorite, color: kBattle, size: 16),
                     const Gap(4),
                     Text('${entry.voteCount}', style: const TextStyle(color: kTextSub)),
                   ],
@@ -299,7 +296,7 @@ class _EntryCard extends StatelessWidget {
             GameSubmitButton(
               onPressed: onVote,
               label: 'Vote',
-              accent: _kAccent,
+              accent: kBattle,
               height: 40,
               elevation: 6,
               borderRadius: 10,

@@ -147,7 +147,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: kAccent,
                     disabledBackgroundColor: kBorder,
-                    foregroundColor: const Color(0xFF060F1E),
+                    foregroundColor: kNight,
                     elevation: 8,
                     shadowColor: kAccent.withValues(alpha: 0.45),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -156,11 +156,11 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(color: Color(0xFF060F1E), strokeWidth: 2.5),
+                          child: CircularProgressIndicator(color: kNight, strokeWidth: 2.5),
                         )
                       : Text(
                           'Join Room',
-                          style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: const Color(0xFF060F1E)),
+                          style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: kNight),
                         ),
                 ),
               ).animate().fadeIn(delay: 300.ms),

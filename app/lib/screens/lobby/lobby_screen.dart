@@ -80,12 +80,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
     if (route != null) context.go(route);
   }
 
-  Color get _modeColor => switch (_room?.mode) {
-        GameMode.fillReveal => kFillReveal,
-        GameMode.rotatingChain => kChain,
-        GameMode.battle => kBattle,
-        null => kAccent,
-      };
+  Color get _modeColor => _room?.mode.color ?? kAccent;
 
   @override
   Widget build(BuildContext context) {
