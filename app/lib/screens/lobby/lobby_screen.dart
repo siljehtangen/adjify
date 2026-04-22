@@ -35,9 +35,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
     _loadRoom();
     _socket.connect();
     _socket.joinRoom(widget.roomCode);
-    _socket.on('room:player_joined', (_) => _loadRoom());
-    _socket.on('room:player_left', (_) => _loadRoom());
-    _socket.on('room:game_started', (_) => _navigateToGame());
+    _socket.on(SocketEvent.playerJoined, (_) => _loadRoom());
+    _socket.on(SocketEvent.playerLeft, (_) => _loadRoom());
+    _socket.on(SocketEvent.gameStarted, (_) => _navigateToGame());
   }
 
   @override
