@@ -43,7 +43,7 @@ final router = GoRouter(
   },
   routes: [
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
-    GoRoute(path: '/', builder: (_, __) => HomeScreen()),
+    GoRoute(path: '/', builder: (_, __) => const HomeScreen()),
     GoRoute(
       path: '/create',
       builder: (_, state) => CreateRoomScreen(mode: state.extra as GameMode),
