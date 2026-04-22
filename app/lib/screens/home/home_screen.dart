@@ -9,9 +9,7 @@ import '../../models/room.dart';
 import '../../services/auth_service.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({super.key});
-
-  final _auth = AuthService();
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +23,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: kTextSub),
             onPressed: () async {
-              await _auth.signOut();
+              await AuthService().signOut();
               if (context.mounted) context.go('/login');
             },
           ),
