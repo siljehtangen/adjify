@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
-import '../../../models/story.dart';
+import '../../../models/battle_entry.dart';
 import '../../../widgets/game_widgets.dart';
 
 class EntryCard extends StatelessWidget {
