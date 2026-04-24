@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
@@ -8,7 +7,8 @@ import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/game_widgets.dart';
 import 'battle_filling_view.dart';
-import 'entry_card.dart';
+import 'battle_results_view.dart';
+import 'battle_voting_view.dart';
 
 enum BattlePhase { filling, waiting, voting, results }
 
@@ -150,43 +150,15 @@ class _BattleScreenState extends State<BattleScreen> {
                   subtitle: 'Waiting for other players…',
                   accent: kBattle,
                 ),
-              BattlePhase.voting => _buildVoting(),
-              BattlePhase.results => _buildResults(),
+              BattlePhase.voting => BattleVotingView(
+                  results: _results,
+                  myId: _myId,
+                  votedEntryId: _votedEntryId,
+                  onVote: _vote,
+                ),
+              BattlePhase.results => BattleResultsView(results: _results),
             },
     );
   }
 
-  Widget _buildVoting() {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Text('Vote for the best story!', style: TextStyle(color: kText, fontSize: 20, fontWeight: FontWeight.bold)),
-        const Gap(16),
-        for (final entry in _results)
-          if (entry.playerId != _myId) ...[
-            EntryCard(
-              entry: entry,
-              voted: _votedEntryId == entry.id,
-              canVote: _votedEntryId == null,
-              onVote: () => _vote(entry.id),
-            ).animate().fadeIn().slideY(begin: 0.1, end: 0),
-            const Gap(12),
-          ],
-      ],
-    );
-  }
-
-  Widget _buildResults() {
-    return ListView(
-      padding: const EdgeInsets.all(24),
-      children: [
-        const Text('🏆 Results', style: TextStyle(color: kText, fontSize: 24, fontWeight: FontWeight.bold)),
-        const Gap(16),
-        for (var i = 0; i < _results.length; i++) ...[
-          EntryCard(entry: _results[i], voted: false, canVote: false, rank: i + 1),
-          const Gap(12),
-        ],
-      ],
-    );
-  }
 }
