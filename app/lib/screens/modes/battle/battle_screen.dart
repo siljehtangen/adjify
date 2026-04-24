@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
-import '../../../models/story.dart';
+import '../../../models/battle_entry.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/game_widgets.dart';
