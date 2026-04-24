@@ -1,19 +1,5 @@
 const kAdjPlaceholder = '[ADJ]';
 
-enum SegmentType { sentence, blankFill }
-
-extension SegmentTypeX on SegmentType {
-  String get value => switch (this) {
-        SegmentType.sentence => 'sentence',
-        SegmentType.blankFill => 'blank_fill',
-      };
-
-  static SegmentType fromString(String s) => switch (s) {
-        'blank_fill' => SegmentType.blankFill,
-        _ => SegmentType.sentence,
-      };
-}
-
 class Story {
   final String id;
   final String roomId;
@@ -79,64 +65,3 @@ class StoryBlank {
       );
 }
 
-class ChainSegment {
-  final String id;
-  final String roomId;
-  final int roundNumber;
-  final SegmentType segmentType;
-  final String? content;
-  final String authorId;
-
-  const ChainSegment({
-    required this.id,
-    required this.roomId,
-    required this.roundNumber,
-    required this.segmentType,
-    this.content,
-    required this.authorId,
-  });
-
-  factory ChainSegment.fromJson(Map<String, dynamic> json) => ChainSegment(
-        id: json['id'] as String,
-        roomId: json['room_id'] as String,
-        roundNumber: json['round_number'] as int,
-        segmentType: SegmentTypeX.fromString(json['segment_type'] as String),
-        content: json['content'] as String?,
-        authorId: json['author_id'] as String,
-      );
-}
-
-class BattleEntry {
-  final String id;
-  final String roomId;
-  final String playerId;
-  final String? continuation;
-  final bool submitted;
-  final int voteCount;
-  final Story? story;
-  final String? username;
-
-  const BattleEntry({
-    required this.id,
-    required this.roomId,
-    required this.playerId,
-    this.continuation,
-    required this.submitted,
-    required this.voteCount,
-    this.story,
-    this.username,
-  });
-
-  factory BattleEntry.fromJson(Map<String, dynamic> json) => BattleEntry(
-        id: json['id'] as String,
-        roomId: json['room_id'] as String,
-        playerId: json['player_id'] as String,
-        continuation: json['continuation'] as String?,
-        submitted: json['submitted_at'] != null,
-        voteCount: json['vote_count'] as int? ?? 0,
-        story: json['stories'] != null
-            ? Story.fromJson(json['stories'] as Map<String, dynamic>)
-            : null,
-        username: (json['profiles'] as Map<String, dynamic>?)?['username'] as String?,
-      );
-}
