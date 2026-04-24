@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
+import '../../../models/chain_segment.dart';
 import '../../../models/story.dart';
 import '../../../widgets/game_widgets.dart';
 
