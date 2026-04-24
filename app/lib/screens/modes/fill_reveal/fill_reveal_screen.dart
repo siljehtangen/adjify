@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
@@ -8,6 +7,9 @@ import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/blank_input_sheet.dart';
 import '../../../widgets/game_widgets.dart';
+import 'filling_view.dart';
+import 'revealed_view.dart';
+import 'story_creator_view.dart';
 
 class FillRevealScreen extends StatefulWidget {
   final String roomCode;
@@ -169,66 +171,12 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   }
 
   Widget _buildStoryCreator() {
-    final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Write a story', style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.bold)),
-          const Gap(8),
-          Text(
-            _isSolo
-                ? 'Add $kAdjPlaceholder placeholders — they\'ll be filled with random adjectives when you save.'
-                : 'Use $kAdjPlaceholder as placeholders for adjectives.\n'
-                    '${_otherPlayerCount > 0 ? 'You need at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The $kAdjPlaceholder cat sat on a $kAdjPlaceholder mat."'}',
-            style: const TextStyle(color: kTextSub, fontSize: 14),
-          ),
-          const Gap(16),
-          GameTextField(
-            controller: _storyController,
-            minLines: 8,
-            maxLines: 16,
-            borderRadius: 14,
-            hintText: 'Write your story here…',
-          ),
-          const Gap(10),
-          GestureDetector(
-            onTap: _insertAdj,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-              decoration: BoxDecoration(
-                color: kFillReveal.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, size: 14, color: kFillReveal),
-                  Gap(4),
-                  Text(
-                    kAdjPlaceholder,
-                    style: TextStyle(
-                      color: kFillReveal,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Gap(12),
-          GameSubmitButton(
-            onPressed: _createStory,
-            label: _isSolo ? 'Save & Fill Randomly' : 'Save Story',
-            accent: kFillReveal,
-          ),
-          const Gap(24),
-        ],
-      ),
+    return StoryCreatorView(
+      storyController: _storyController,
+      isSolo: _isSolo,
+      otherPlayerCount: _otherPlayerCount,
+      onInsertAdj: _insertAdj,
+      onCreateStory: _createStory,
     );
   }
 
@@ -239,152 +187,12 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!_revealed) ...[
-            _buildFillingView(story),
-          ] else ...[
-            _buildRevealedView(story),
-          ],
+          if (!_revealed)
+            FillingView(story: story, isHost: _isHost, isSolo: _isSolo, onFillBlank: _fillBlank)
+          else
+            RevealedView(story: story),
         ],
       ),
     );
-  }
-
-  Widget _buildFillingView(Story story) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (_isHost && !_isSolo) ...[
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: kFillReveal.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: kFillReveal.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.info_outline, color: kFillReveal, size: 18),
-                const Gap(10),
-                Expanded(
-                  child: Text(
-                    'You wrote this story. Wait for the other players to fill in the blanks.',
-                    style: TextStyle(color: kText.withValues(alpha: 0.8), fontSize: 13),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Gap(16),
-        ],
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: kSurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: kBorder),
-          ),
-          child: Text(
-            story.rendered,
-            style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
-          ),
-        ),
-        const Gap(20),
-        Row(
-          children: [
-            Text(
-              '${story.filledCount}/${story.blanks.length} blanks filled',
-              style: const TextStyle(color: kTextSub),
-            ),
-            const Gap(12),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: story.blanks.isEmpty ? 0 : story.filledCount / story.blanks.length,
-                  backgroundColor: kBorder,
-                  color: kFillReveal,
-                  minHeight: 6,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const Gap(16),
-        _buildBlanks(story),
-      ],
-    );
-  }
-
-  Widget _buildBlanks(Story story) {
-    if (!_isHost || _isSolo) {
-      return Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: story.blanks.map((blank) {
-          return GestureDetector(
-            onTap: () => _fillBlank(story, blank),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: blank.isFilled ? kFillReveal.withValues(alpha: 0.2) : kSurface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: blank.isFilled ? kFillReveal : kBorder),
-                boxShadow: blank.isFilled
-                    ? [BoxShadow(color: kFillReveal.withValues(alpha: 0.25), blurRadius: 8)]
-                    : [],
-              ),
-              child: Text(
-                blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
-                style: TextStyle(
-                  color: blank.isFilled ? kFillReveal : kTextSub,
-                  fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: story.blanks.map((blank) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: blank.isFilled ? kFillReveal.withValues(alpha: 0.15) : kSurface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: blank.isFilled ? kFillReveal.withValues(alpha: 0.5) : kBorder,
-            ),
-          ),
-          child: Text(
-            blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
-            style: TextStyle(
-              color: blank.isFilled ? kFillReveal : kTextSub.withValues(alpha: 0.4),
-              fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildRevealedView(Story story) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: kSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
-        boxShadow: [BoxShadow(color: kFillReveal.withValues(alpha: 0.15), blurRadius: 20)],
-      ),
-      child: Text(
-        story.rendered,
-        style: const TextStyle(color: kText, fontSize: 18, height: 1.7),
-      ),
-    ).animate().fadeIn().scale(begin: const Offset(0.95, 0.95));
   }
 }
