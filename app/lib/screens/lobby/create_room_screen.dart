@@ -74,54 +74,11 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             const Gap(6),
             Text(_playerHint(widget.mode), style: const TextStyle(color: kTextSub, fontSize: 13)),
             const Gap(16),
-            Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: _options.map((n) {
-                final selected = _maxPlayers == n;
-                return GestureDetector(
-                  onTap: () => setState(() => _maxPlayers = n),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 160),
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      color: selected ? color : kSurface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: selected ? color : kBorder, width: selected ? 2 : 1.5),
-                      boxShadow: selected
-                          ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
-                          : [],
-                    ),
-                    child: Center(
-                      child: n == 1
-                          ? Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                FaIcon(FontAwesomeIcons.user, size: 16, color: selected ? Colors.white : color),
-                                const Gap(2),
-                                Text(
-                                  'Solo',
-                                  style: TextStyle(
-                                    color: selected ? Colors.white : color,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            )
-                          : Text(
-                              '$n',
-                              style: TextStyle(
-                                color: selected ? Colors.white : kText,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 20,
-                              ),
-                            ),
-                    ),
-                  ),
-                );
-              }).toList(),
+            _PlayerCountPicker(
+              options: _options,
+              selected: _maxPlayers,
+              color: color,
+              onSelect: (n) => setState(() => _maxPlayers = n),
             ),
             const Spacer(),
             SizedBox(
@@ -157,6 +114,73 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
         GameMode.battle => 'Min 2, max 8 — everyone fills the same story and votes.',
       };
 
+}
+
+class _PlayerCountPicker extends StatelessWidget {
+  final List<int> options;
+  final int selected;
+  final Color color;
+  final void Function(int) onSelect;
+
+  const _PlayerCountPicker({
+    required this.options,
+    required this.selected,
+    required this.color,
+    required this.onSelect,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: options.map((n) {
+        final isSelected = selected == n;
+        return GestureDetector(
+          onTap: () => onSelect(n),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: isSelected ? color : kSurface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: isSelected ? color : kBorder, width: isSelected ? 2 : 1.5),
+              boxShadow: isSelected
+                  ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
+                  : [],
+            ),
+            child: Center(
+              child: n == 1
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FaIcon(FontAwesomeIcons.user, size: 16, color: isSelected ? Colors.white : color),
+                        const Gap(2),
+                        Text(
+                          'Solo',
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : color,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      '$n',
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : kText,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                      ),
+                    ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
 }
 
 class _ModeInfoBanner extends StatelessWidget {
