@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -7,6 +6,22 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/game_widgets.dart';
+
+// Story fragments shown as faded background text
+const _kFragments = [
+  (text: 'Once upon a time, a ridiculous dragon decided to...', top: 0.06, left: 0.0, rot: -1.8),
+  (text: 'She was the most magnificent creature in all the...', top: 0.15, left: 0.05, rot: 1.2),
+  (text: 'The old wizard had a peculiar habit of collecting...', top: 0.24, left: -0.02, rot: -0.8),
+  (text: 'Nobody expected the extraordinary letter that arrived...', top: 0.33, left: 0.03, rot: 1.5),
+  (text: 'With a tremendous leap he soared over the...', top: 0.55, left: 0.0, rot: -1.2),
+  (text: 'The mysterious village had a delightfully chaotic...', top: 0.64, left: 0.04, rot: 0.9),
+  (text: 'She declared in the most dramatic voice that...', top: 0.73, left: -0.01, rot: -1.5),
+  (text: 'It was a dark and stormy night when the peculiar...', top: 0.82, left: 0.02, rot: 1.0),
+  (text: 'The legendary cat sat on the absolutely enormous...', top: 0.91, left: 0.0, rot: -0.7),
+];
+
+// The line that looks actively typed (positioned near the middle)
+const _kTypingLine = 'The brave yet clumsy knight grabbed his';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,8 +34,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   final _auth = AuthService();
   bool _loading = false;
 
-  late AnimationController _floatController;
   late AnimationController _pulseController;
+  late AnimationController _cursorController;
+  late AnimationController _typingController;
+
+  int _typedChars = 0;
 
   final List<String> _adjectives = ['creative', 'hilarious', 'ridiculous', 'epic', 'wild', 'chaotic', 'legendary'];
   int _wordIndex = 0;
@@ -28,9 +46,20 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _floatController = AnimationController(vsync: this, duration: const Duration(seconds: 4))..repeat();
     _pulseController = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat(reverse: true);
+    _cursorController = AnimationController(vsync: this, duration: const Duration(milliseconds: 530))..repeat(reverse: true);
+    _typingController = AnimationController(vsync: this, duration: const Duration(milliseconds: 80));
+    _startTyping();
     _startWordRotation();
+  }
+
+  Future<void> _startTyping() async {
+    await Future.delayed(const Duration(milliseconds: 800));
+    while (mounted && _typedChars < _kTypingLine.length) {
+      await Future.delayed(const Duration(milliseconds: 70));
+      if (!mounted) break;
+      setState(() => _typedChars++);
+    }
   }
 
   Future<void> _startWordRotation() async {
@@ -44,8 +73,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   void dispose() {
-    _floatController.dispose();
     _pulseController.dispose();
+    _cursorController.dispose();
+    _typingController.dispose();
     super.dispose();
   }
 
@@ -73,12 +103,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         child: Stack(
           children: [
-            _FloatingIcon(icon: FontAwesomeIcons.bookOpen, color: kFillReveal, topFrac: 0.13, leftFrac: 0.07, phase: 0.0, controller: _floatController, iconSize: 26),
-            _FloatingIcon(icon: FontAwesomeIcons.arrowsRotate, color: kChain, topFrac: 0.22, rightFrac: 0.08, phase: 0.3, controller: _floatController, iconSize: 22),
-            _FloatingIcon(icon: FontAwesomeIcons.trophy, color: kBattle, topFrac: 0.67, leftFrac: 0.06, phase: 0.6, controller: _floatController, iconSize: 24),
-            _FloatingIcon(icon: FontAwesomeIcons.star, color: kGold, topFrac: 0.74, rightFrac: 0.09, phase: 0.15, controller: _floatController, iconSize: 18),
-            _FloatingIcon(icon: FontAwesomeIcons.pen, color: kAccent, topFrac: 0.09, rightFrac: 0.20, phase: 0.75, controller: _floatController, iconSize: 15),
-            _FloatingIcon(icon: FontAwesomeIcons.userGroup, color: kChain, topFrac: 0.78, leftFrac: 0.26, phase: 0.45, controller: _floatController, iconSize: 16),
+            _buildStoryBackground(context),
             SafeArea(
               child: Center(
                 child: Padding(
@@ -112,6 +137,80 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     );
   }
 
+  Widget _buildStoryBackground(BuildContext context) {
+    final w = MediaQuery.of(context).size.width;
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Stack(
+          children: [
+            // Static faded story lines
+            for (var i = 0; i < _kFragments.length; i++)
+              Positioned(
+                top: MediaQuery.of(context).size.height * _kFragments[i].top,
+                left: w * _kFragments[i].left,
+                right: 0,
+                child: Transform.rotate(
+                  angle: _kFragments[i].rot * 0.0174533,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _kFragments[i].text,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                    softWrap: false,
+                    style: GoogleFonts.lora(
+                      fontSize: 13,
+                      color: kText.withValues(alpha: 0.07 + (i % 3) * 0.02),
+                      fontStyle: FontStyle.italic,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                )
+                    .animate()
+                    .fadeIn(delay: (400 + i * 150).ms, duration: 1200.ms),
+              ),
+
+            // Actively "typed" line with cursor in the middle of the screen
+            Positioned(
+              top: MediaQuery.of(context).size.height * 0.44,
+              left: w * 0.02,
+              right: 0,
+              child: Transform.rotate(
+                angle: -0.5 * 0.0174533,
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _kTypingLine.substring(0, _typedChars),
+                      style: GoogleFonts.lora(
+                        fontSize: 13,
+                        color: kAccent.withValues(alpha: 0.18),
+                        fontStyle: FontStyle.italic,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                    // Blinking cursor
+                    AnimatedBuilder(
+                      animation: _cursorController,
+                      builder: (_, __) => Opacity(
+                        opacity: _cursorController.value > 0.5 ? 1.0 : 0.0,
+                        child: Container(
+                          width: 1.5,
+                          height: 13,
+                          color: kAccent.withValues(alpha: 0.35),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ).animate().fadeIn(delay: 600.ms, duration: 400.ms),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildLogo() {
     return AnimatedBuilder(
       animation: _pulseController,
@@ -125,7 +224,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             shape: BoxShape.circle,
             border: Border.all(color: kAccent.withValues(alpha: 0.18 + p * 0.22), width: 2),
             boxShadow: [
-              BoxShadow(color: kAccent.withValues(alpha: 0.12 + p * 0.18), blurRadius: 28 + p * 22, spreadRadius: 2 + p * 5),
+              BoxShadow(
+                color: kAccent.withValues(alpha: 0.12 + p * 0.18),
+                blurRadius: 28 + p * 22,
+                spreadRadius: 2 + p * 5,
+              ),
             ],
           ),
           child: const Center(
@@ -192,60 +295,5 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
       ),
     ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.5, end: 0);
-  }
-}
-
-class _FloatingIcon extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final double topFrac;
-  final double? leftFrac;
-  final double? rightFrac;
-  final double phase;
-  final AnimationController controller;
-  final double iconSize;
-
-  const _FloatingIcon({
-    required this.icon,
-    required this.color,
-    required this.topFrac,
-    this.leftFrac,
-    this.rightFrac,
-    required this.phase,
-    required this.controller,
-    required this.iconSize,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Positioned(
-      top: size.height * topFrac,
-      left: leftFrac != null ? size.width * leftFrac! : null,
-      right: rightFrac != null ? size.width * rightFrac! : null,
-      child: AnimatedBuilder(
-        animation: controller,
-        builder: (context, child) {
-          final t = (controller.value + phase) % 1.0;
-          final dy = sin(t * pi * 2) * 9.0;
-          return Transform.translate(
-            offset: Offset(0, dy),
-            child: child,
-          );
-        },
-        child: Container(
-          width: iconSize + 26,
-          height: iconSize + 26,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.11),
-            shape: BoxShape.circle,
-            border: Border.all(color: color.withValues(alpha: 0.22), width: 1.5),
-          ),
-          child: Center(child: FaIcon(icon, color: color.withValues(alpha: 0.65), size: iconSize)),
-        )
-            .animate()
-            .fadeIn(delay: (300 + phase * 500).ms, duration: 700.ms),
-      ),
-    );
   }
 }
