@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
 import { getRoomByCode } from '../services/roomService.js';
 import { routeError } from '../utils/routeError.js';
+import { shuffleArray } from '../utils/shuffle.js';
 import { emitToRoom } from '../services/socketService.js';
 import {
   submitBattleEntry,
@@ -65,11 +66,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     try {
       const positions = parsed.data.filledBlanks.map(b => b.position);
-      const adjectives = parsed.data.filledBlanks.map(b => b.adjective);
-      for (let i = adjectives.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [adjectives[i], adjectives[j]] = [adjectives[j], adjectives[i]];
-      }
+      const adjectives = shuffleArray(parsed.data.filledBlanks.map(b => b.adjective));
       for (let i = 0; i < positions.length; i++) {
         await fillBlank(playerStory.id, positions[i], adjectives[i], req.user!.id);
       }

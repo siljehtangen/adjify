@@ -5,6 +5,7 @@ import { getRoomByCode } from '../services/roomService.js';
 import { countBlanks, createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
 import { supabase } from '../config/supabase.js';
 import { routeError } from '../utils/routeError.js';
+import { shuffleArray } from '../utils/shuffle.js';
 import { emitToRoom } from '../services/socketService.js';
 
 const router = Router({ mergeParams: true });
@@ -90,11 +91,7 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
           .eq('story_id', req.params.storyId)
           .order('position');
         if (blanks && blanks.length > 1) {
-          const adjectives = blanks.map((b: { adjective: string }) => b.adjective);
-          for (let i = adjectives.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [adjectives[i], adjectives[j]] = [adjectives[j], adjectives[i]];
-          }
+          const adjectives = shuffleArray(blanks.map((b: { adjective: string }) => b.adjective));
           await Promise.all(
             blanks.map((b: { position: number }, i: number) =>
               supabase
