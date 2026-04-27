@@ -3,6 +3,7 @@ import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
 import '../../../models/battle_entry.dart';
+import '../../../models/room.dart';
 import '../../../services/api_service.dart';
 import '../../../services/socket_service.dart';
 import '../../../widgets/game_widgets.dart';
@@ -156,7 +157,15 @@ class _BattleScreenState extends State<BattleScreen> {
                   votedEntryId: _votedEntryId,
                   onVote: _vote,
                 ),
-              BattlePhase.results => BattleResultsView(results: _results),
+              BattlePhase.results => Column(
+                  children: [
+                    Expanded(child: BattleResultsView(results: _results)),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(24, 0, 24, 24),
+                      child: EndButtons(mode: GameMode.battle, accent: kBattle),
+                    ),
+                  ],
+                ),
             },
     );
   }
