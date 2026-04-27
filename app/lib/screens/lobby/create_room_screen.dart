@@ -39,7 +39,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       final room = await _api.createRoom(widget.mode, maxPlayers: _maxPlayers);
       if (mounted) context.push('/lobby/${room.code}', extra: room);
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e.toString());
+      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to create room');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

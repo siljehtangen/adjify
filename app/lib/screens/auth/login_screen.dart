@@ -21,7 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await _auth.signInWithGoogle();
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, 'Sign in failed: $e');
+      if (mounted) showErrorToast('Sign-in failed. Please try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

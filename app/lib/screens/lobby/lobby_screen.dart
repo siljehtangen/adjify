@@ -65,7 +65,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
       _navigateToGame();
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, e.toString());
+        showErrorToast(e is ApiException ? e.message : 'Failed to start the game');
         setState(() => _starting = false);
       }
     }

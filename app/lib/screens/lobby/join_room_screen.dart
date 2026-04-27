@@ -29,7 +29,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
       final room = await _api.joinRoom(code);
       if (mounted) context.push('/lobby/${room.code}', extra: room);
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e.toString());
+      if (mounted) showErrorToast(e is ApiException ? e.message : 'Room not found. Check the code and try again.');
     } finally {
       if (mounted) setState(() => _loading = false);
     }

@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../widgets/snackbars.dart';
 
 class RoomCodeCard extends StatelessWidget {
   final String roomCode;
@@ -45,13 +46,7 @@ class RoomCodeCard extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 Clipboard.setData(ClipboardData(text: roomCode));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Code copied!'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                );
+                showSuccessToast('Room code copied!');
               },
               child: Container(
                 width: 42,
