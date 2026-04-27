@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:toastification/toastification.dart';
 import 'config/app_theme.dart';
 import 'config/env.dart';
 import 'router.dart';
@@ -20,11 +21,13 @@ class AdjifyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Adjify',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
-      routerConfig: router,
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        title: 'Adjify',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.dark,
+        routerConfig: router,
+      ),
     );
   }
 }
