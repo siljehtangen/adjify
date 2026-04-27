@@ -82,7 +82,32 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
       req.user!.id
     );
     emitToRoom(req.io, req.params.code, 'game:blank_filled', {});
-    if (result.isComplete) emitToRoom(req.io, req.params.code, 'game:story_revealed', {});
+    if (result.isComplete) {
+      if (isSolo) {
+        const { data: blanks } = await supabase
+          .from('story_blanks')
+          .select('position, adjective')
+          .eq('story_id', req.params.storyId)
+          .order('position');
+        if (blanks && blanks.length > 1) {
+          const adjectives = blanks.map((b: { adjective: string }) => b.adjective);
+          for (let i = adjectives.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [adjectives[i], adjectives[j]] = [adjectives[j], adjectives[i]];
+          }
+          await Promise.all(
+            blanks.map((b: { position: number }, i: number) =>
+              supabase
+                .from('story_blanks')
+                .update({ adjective: adjectives[i] })
+                .eq('story_id', req.params.storyId)
+                .eq('position', b.position)
+            )
+          );
+        }
+      }
+      emitToRoom(req.io, req.params.code, 'game:story_revealed', {});
+    }
     return res.json(result);
   } catch (err: any) {
     return routeError(res, err);
