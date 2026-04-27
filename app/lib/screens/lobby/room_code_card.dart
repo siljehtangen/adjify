@@ -40,26 +40,29 @@ class RoomCodeCard extends StatelessWidget {
             ],
           ),
           const Spacer(),
-          GestureDetector(
-            onTap: () {
-              Clipboard.setData(ClipboardData(text: roomCode));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Code copied!'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                Clipboard.setData(ClipboardData(text: roomCode));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Code copied!'),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+              },
+              child: Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: kAccent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: kAccent.withValues(alpha: 0.3)),
                 ),
-              );
-            },
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: BoxDecoration(
-                color: kAccent.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: kAccent.withValues(alpha: 0.3)),
+                child: const Center(child: FaIcon(FontAwesomeIcons.copy, size: 16, color: kAccent)),
               ),
-              child: const Center(child: FaIcon(FontAwesomeIcons.copy, size: 16, color: kAccent)),
             ),
           ),
         ],

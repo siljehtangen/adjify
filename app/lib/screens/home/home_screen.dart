@@ -105,57 +105,60 @@ class _ModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => context.push('/create', extra: mode),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: kSurface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: kBorder),
-          boxShadow: [BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 4))],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: color.withValues(alpha: 0.3)),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => context.push('/create', extra: mode),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: kSurface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: kBorder),
+            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 4))],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: color.withValues(alpha: 0.3)),
+                ),
+                child: Center(child: FaIcon(icon, color: color, size: 22)),
               ),
-              child: Center(child: FaIcon(icon, color: color, size: 22)),
-            ),
-            const Gap(16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600)),
-                  const Gap(3),
-                  Text(subtitle, style: const TextStyle(color: kTextSub, fontSize: 13)),
-                  const Gap(6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: color.withValues(alpha: 0.35)),
+              const Gap(16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600)),
+                    const Gap(3),
+                    Text(subtitle, style: const TextStyle(color: kTextSub, fontSize: 13)),
+                    const Gap(6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: color.withValues(alpha: 0.35)),
+                      ),
+                      child: Text(
+                        playerLabel,
+                        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
+                      ),
                     ),
-                    child: Text(
-                      playerLabel,
-                      style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            FaIcon(FontAwesomeIcons.chevronRight, color: kBorder.withValues(alpha: 1.0), size: 14),
-          ],
+              FaIcon(FontAwesomeIcons.chevronRight, color: kBorder.withValues(alpha: 1.0), size: 14),
+            ],
+          ),
         ),
-      ),
-    ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.06, end: 0);
+      ).animate().fadeIn(delay: Duration(milliseconds: delay)).slideX(begin: 0.06, end: 0),
+    );
   }
 }
 

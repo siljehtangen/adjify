@@ -136,45 +136,48 @@ class _PlayerCountPicker extends StatelessWidget {
       runSpacing: 10,
       children: options.map((n) {
         final isSelected = selected == n;
-        return GestureDetector(
-          onTap: () => onSelect(n),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 160),
-            width: 58,
-            height: 58,
-            decoration: BoxDecoration(
-              color: isSelected ? color : kSurface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: isSelected ? color : kBorder, width: isSelected ? 2 : 1.5),
-              boxShadow: isSelected
-                  ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
-                  : [],
-            ),
-            child: Center(
-              child: n == 1
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FaIcon(FontAwesomeIcons.user, size: 16, color: isSelected ? Colors.white : color),
-                        const Gap(2),
-                        Text(
-                          'Solo',
-                          style: TextStyle(
-                            color: isSelected ? Colors.white : color,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
+        return MouseRegion(
+          cursor: SystemMouseCursors.click,
+          child: GestureDetector(
+            onTap: () => onSelect(n),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: 58,
+              height: 58,
+              decoration: BoxDecoration(
+                color: isSelected ? color : kSurface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: isSelected ? color : kBorder, width: isSelected ? 2 : 1.5),
+                boxShadow: isSelected
+                    ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 14, offset: const Offset(0, 4))]
+                    : [],
+              ),
+              child: Center(
+                child: n == 1
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FaIcon(FontAwesomeIcons.user, size: 16, color: isSelected ? Colors.white : color),
+                          const Gap(2),
+                          Text(
+                            'Solo',
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : color,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
+                        ],
+                      )
+                    : Text(
+                        '$n',
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : kText,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
                         ),
-                      ],
-                    )
-                  : Text(
-                      '$n',
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : kText,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 20,
                       ),
-                    ),
+              ),
             ),
           ),
         );

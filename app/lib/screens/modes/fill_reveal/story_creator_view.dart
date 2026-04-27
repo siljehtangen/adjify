@@ -46,30 +46,33 @@ class StoryCreatorView extends StatelessWidget {
             hintText: 'Write your story here…',
           ),
           const Gap(10),
-          GestureDetector(
-            onTap: onInsertAdj,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-              decoration: BoxDecoration(
-                color: kFillReveal.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, size: 14, color: kFillReveal),
-                  Gap(4),
-                  Text(
-                    kAdjPlaceholder,
-                    style: TextStyle(
-                      color: kFillReveal,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: onInsertAdj,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                decoration: BoxDecoration(
+                  color: kFillReveal.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: kFillReveal.withValues(alpha: 0.4)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.add, size: 14, color: kFillReveal),
+                    Gap(4),
+                    Text(
+                      kAdjPlaceholder,
+                      style: TextStyle(
+                        color: kFillReveal,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'monospace',
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
