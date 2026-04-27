@@ -57,7 +57,7 @@ class ChainTurnView extends StatelessWidget {
             ],
           ),
         ),
-        if (previous != null) ...[
+        if (isSentence && previous != null) ...[
           const Gap(16),
           const Text('Previous:', style: TextStyle(color: kTextSub, fontSize: 12)),
           const Gap(4),
