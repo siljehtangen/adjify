@@ -45,19 +45,7 @@ class FillingView extends StatelessWidget {
           ),
           const Gap(16),
         ],
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: kSurface,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: kBorder),
-          ),
-          child: Text(
-            story.rendered,
-            style: const TextStyle(color: kText, fontSize: 16, height: 1.6),
-          ),
-        ),
-        const Gap(20),
+        const Gap(4),
         Row(
           children: [
             Text(
@@ -105,24 +93,27 @@ class _BlanksRow extends StatelessWidget {
         spacing: 8,
         runSpacing: 8,
         children: story.blanks.map((blank) {
-          return GestureDetector(
-            onTap: () => onFillBlank(story, blank),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: blank.isFilled ? kFillReveal.withValues(alpha: 0.2) : kSurface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: blank.isFilled ? kFillReveal : kBorder),
-                boxShadow: blank.isFilled
-                    ? [BoxShadow(color: kFillReveal.withValues(alpha: 0.25), blurRadius: 8)]
-                    : [],
-              ),
-              child: Text(
-                blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
-                style: TextStyle(
-                  color: blank.isFilled ? kFillReveal : kTextSub,
-                  fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
+          return MouseRegion(
+            cursor: blank.isFilled ? SystemMouseCursors.basic : SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => onFillBlank(story, blank),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: blank.isFilled ? kFillReveal.withValues(alpha: 0.2) : kSurface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: blank.isFilled ? kFillReveal : kBorder),
+                  boxShadow: blank.isFilled
+                      ? [BoxShadow(color: kFillReveal.withValues(alpha: 0.25), blurRadius: 8)]
+                      : [],
+                ),
+                child: Text(
+                  blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
+                  style: TextStyle(
+                    color: blank.isFilled ? kFillReveal : kTextSub,
+                    fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
+                  ),
                 ),
               ),
             ),
