@@ -71,7 +71,8 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
     if (!isMember) return res.status(403).json({ error: 'Not a member of this room' });
 
     const story = await getStoryWithBlanks(req.params.storyId);
-    if (story.created_by === req.user!.id) {
+    const isSolo = room.room_players.length === 1;
+    if (!isSolo && story.created_by === req.user!.id) {
       return res.status(403).json({ error: 'The story writer cannot fill their own blanks' });
     }
     const result = await fillBlank(
