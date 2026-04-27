@@ -102,7 +102,7 @@ class _BattleScreenState extends State<BattleScreen> {
       if (result['allSubmitted'] == true) _loadResults();
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, e.toString());
+        showErrorToast(e is ApiException ? e.message : 'Failed to submit your entry');
         setState(() => _submitting = false);
       }
     }
@@ -115,7 +115,7 @@ class _BattleScreenState extends State<BattleScreen> {
       setState(() => _votedEntryId = entryId);
       _loadResults();
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e.toString());
+      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to cast vote');
     }
   }
 

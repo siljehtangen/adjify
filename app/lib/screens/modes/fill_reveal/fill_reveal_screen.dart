@@ -88,13 +88,13 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   Future<void> _createStory() async {
     final content = _storyController.text.trim();
     if (content.isEmpty || !content.contains(kAdjPlaceholder)) {
-      showErrorSnackBar(context, 'Story must contain at least one $kAdjPlaceholder placeholder');
+      showErrorToast('Your story needs at least one $kAdjPlaceholder placeholder');
       return;
     }
     final blankCount = kAdjPlaceholder.allMatches(content).length;
     final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
     if (blankCount < minBlanks) {
-      showErrorSnackBar(context, 'Add at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player');
+      showErrorToast('Add at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player');
       return;
     }
     try {
@@ -102,7 +102,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       _storyController.clear();
       await _load();
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e.toString());
+      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to create story');
     }
   }
 
@@ -122,7 +122,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       await _load();
       if (result['isComplete'] == true && mounted) setState(() => _revealed = true);
     } catch (e) {
-      if (mounted) showErrorSnackBar(context, e.toString());
+      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to submit adjective');
     }
   }
 

@@ -68,7 +68,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       setState(() { _submitted = true; _submitting = false; });
     } catch (e) {
       if (mounted) {
-        showErrorSnackBar(context, e.toString());
+        showErrorToast(e is ApiException ? e.message : 'Failed to submit');
         setState(() => _submitting = false);
       }
     }
