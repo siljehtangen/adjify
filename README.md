@@ -2,8 +2,8 @@
 
 A multiplayer adjective storytelling game where players collaborate or compete to fill in the blanks and build stories together.
 
-![Login screen](app/web/login.png)
-![Lobby screen](app/web/lobby.png)
+![Login screen](assets/login.png)
+![Lobby screen](assets/lobby.png)
 
 ## Game modes
 
