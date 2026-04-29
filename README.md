@@ -1,34 +1,27 @@
 # Adjify
 
-A multiplayer adjective storytelling game where players collaborate (or compete) to fill in the blanks and build stories together.
+A multiplayer adjective storytelling game where players collaborate or compete to fill in the blanks and build stories together.
 
-## What it does
+![Login screen](app/web/login.png)
+![Lobby screen](app/web/lobby.png)
 
-Adjify lets players join rooms and play one of three game modes:
+## Game modes
 
-- **Fill & Reveal** — A story is shown with `[ADJ]` blanks. Players fill them in solo or as a group, then the completed story is revealed.
-- **Rotating Chain** — 3–6 players alternate between writing sentences and filling adjective blanks. No one ever sees the full story until the end.
-- **Adjective Battle** — A master player creates a prompt. Everyone independently fills the blanks and writes a continuation, then the group votes on the best result.
+- **Fill & Reveal** — A story is shown with `[ADJ]` blanks. Players fill them in, then the completed story is revealed.
+- **Rotating Chain** — 3–6 players alternate between writing sentences and filling adjective blanks. The full story is hidden until the end.
+- **Adjective Battle** — A master creates a prompt. Everyone fills the blanks and writes a continuation, then the group votes on the best result.
 
-Authentication is handled via Google OAuth through Supabase. Rooms are real-time using WebSockets.
-
----
-
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
 | Mobile app | Flutter (Dart) |
-| Backend API & WebSockets | Node.js + TypeScript + Express + Socket.io |
+| Backend | Node.js + TypeScript + Express + Socket.io |
 | Database & Auth | Supabase (PostgreSQL + Google OAuth) |
-| Navigation (app) | GoRouter |
-| Environment config (app) | envied + build_runner |
+| Navigation | GoRouter |
+| Env config | envied + build_runner |
 
-The app is primarily built in Flutter/Dart, with TypeScript used only for the backend. Node.js was chosen over a pure‑Dart backend due to its mature Socket.io ecosystem, which makes implementing reliable real‑time room and game‑state handling substantially easier. 
-
----
-
-## Project Structure
+## Project structure
 
 ```
 adjify/
@@ -52,33 +45,18 @@ adjify/
 │
 └── supabase/
     └── migrations/
-        ├── 001_initial_schema.sql   # Full schema + RLS policies
-        └── 002_rpc.sql              # increment_vote RPC
+        ├── 001_initial_schema.sql
+        └── 002_rpc.sql
 ```
-
----
-
-## Database Tables
-
-`profiles` · `rooms` · `room_players` · `stories` · `story_blanks` · `chain_segments` · `battle_entries` · `votes`
-
----
 
 ## Setup
 
-### Prerequisites
-
-- [Flutter SDK](https://docs.flutter.dev/get-started/install)
-- Node.js 18+
-- A [Supabase](https://supabase.com) project with Google OAuth enabled
+**Prerequisites:** Flutter SDK, Node.js 18+, Supabase project with Google OAuth enabled.
 
 ### 1. Environment variables
 
 ```bash
-# Backend
 cp backend/.env.example backend/.env
-
-# Flutter app
 cp app/.env.example app/.env
 ```
 
@@ -98,17 +76,13 @@ npm run dev
 cd app
 flutter pub get
 flutter pub run build_runner build
-
-# Run on web (Edge, port 8080)
 flutter run -d edge --web-port 8080
 ```
 
 ### 4. Database
 
-Apply migrations via the Supabase CLI or dashboard:
-
 ```bash
 supabase db push
 ```
 
-Then enable **Google OAuth** in your Supabase project under Authentication → Providers.
+Enable **Google OAuth** in your Supabase project under Authentication → Providers.
