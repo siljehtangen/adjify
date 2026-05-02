@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
 import '../../../models/chain_segment.dart';
 import '../../../services/api_service.dart';
@@ -39,6 +38,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
 
   @override
   void dispose() {
+    _socket.off(SocketEvent.chainSubmitted);
     _socket.leaveRoom(widget.roomCode);
     _socket.disconnect();
     _controller.dispose();
@@ -87,11 +87,7 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kChain))
           : _error != null
-              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(_error!, style: const TextStyle(color: kTextSub)),
-                  const Gap(12),
-                  TextButton(onPressed: _loadTurn, child: const Text('Retry', style: TextStyle(color: kChain))),
-                ]))
+              ? ErrorRetry(error: _error!, onRetry: _loadTurn, accentColor: kChain)
           : Padding(
               padding: const EdgeInsets.all(24),
               child: _isMyTurn && !_submitted
