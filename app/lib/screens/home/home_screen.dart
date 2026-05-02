@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../models/room.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/game_widgets.dart';
@@ -19,7 +19,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: kBg,
         elevation: 0,
-        title: Text('Adjify', style: GoogleFonts.lora(color: kAccent, fontWeight: FontWeight.w700, fontSize: 22)),
+        title: Text('Adjify', style: AppTextStyle.appBarLogo),
         actions: [
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: kTextSub),
@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               Text(
                 'Choose a mode',
-                style: GoogleFonts.lora(fontSize: 26, fontWeight: FontWeight.w700, color: kText),
+                style: AppTextStyle.screenHeading,
               ).animate().fadeIn(),
               const Gap(4),
               const Text(
@@ -131,7 +131,7 @@ class _ModeCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600)),
+                    Text(title, style: AppTextStyle.sectionTitle),
                     const Gap(3),
                     Text(subtitle, style: const TextStyle(color: kTextSub, fontSize: 13)),
                     const Gap(6),
