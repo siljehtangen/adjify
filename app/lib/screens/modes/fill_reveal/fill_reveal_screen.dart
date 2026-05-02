@@ -50,6 +50,9 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
 
   @override
   void dispose() {
+    _socket.off(SocketEvent.blankFilled);
+    _socket.off(SocketEvent.storyRevealed);
+    _socket.off(SocketEvent.storyCreated);
     _socket.leaveRoom(widget.roomCode);
     _socket.disconnect();
     _storyController.dispose();
@@ -149,11 +152,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kFillReveal))
           : _error != null
-              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(_error!, style: const TextStyle(color: kTextSub)),
-                  const Gap(12),
-                  TextButton(onPressed: _load, child: const Text('Retry', style: TextStyle(color: kFillReveal))),
-                ]))
+              ? ErrorRetry(error: _error!, onRetry: _load, accentColor: kFillReveal)
           : _stories.isEmpty
               ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
               : _buildGameView(),
