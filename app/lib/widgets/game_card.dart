@@ -15,7 +15,7 @@ class GameCard extends StatelessWidget {
     this.padding,
     this.borderColor = kBorder,
     this.shadowColor,
-    this.borderRadius = 16,
+    this.borderRadius = AppRadius.lg,
     this.width,
   });
 
