@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
 import '../../../models/battle_entry.dart';
@@ -49,6 +48,8 @@ class _BattleScreenState extends State<BattleScreen> {
 
   @override
   void dispose() {
+    _socket.off(SocketEvent.battleReveal);
+    _socket.off(SocketEvent.voteCast);
     _socket.leaveRoom(widget.roomCode);
     _socket.disconnect();
     _continuationController.dispose();
@@ -61,6 +62,8 @@ class _BattleScreenState extends State<BattleScreen> {
     try {
       final prompt = await _api.getBattlePrompt(widget.roomCode);
       final blanks = (prompt['story_blanks'] as List?)?.length ?? 0;
+      for (final c in _adjectives.values) { c.dispose(); }
+      _adjectives.clear();
       for (var i = 0; i < blanks; i++) {
         _adjectives[i] = TextEditingController();
       }
@@ -132,11 +135,7 @@ class _BattleScreenState extends State<BattleScreen> {
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kBattle))
           : _error != null
-              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(_error!, style: const TextStyle(color: kTextSub)),
-                  const Gap(12),
-                  TextButton(onPressed: _loadPrompt, child: const Text('Retry', style: TextStyle(color: kBattle))),
-                ]))
+              ? ErrorRetry(error: _error!, onRetry: _loadPrompt, accentColor: kBattle)
           : switch (_phase) {
               BattlePhase.filling => BattleFillingView(
                   prompt: _prompt!,
