@@ -3,8 +3,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../services/api_service.dart';
 import '../../widgets/game_widgets.dart';
 
@@ -49,7 +49,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
         backgroundColor: kBg,
         elevation: 0,
         leading: const BackButton(color: kText),
-        title: Text('Join a Room', style: GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600)),
+        title: Text('Join a Room', style: AppTextStyle.appBarTitle),
       ),
       body: SafeArea(
         child: Padding(
@@ -57,17 +57,12 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
+              GameCard(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: kSurface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: kAccent.withValues(alpha: 0.3)),
-                  boxShadow: [
-                    BoxShadow(color: kAccent.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 4)),
-                  ],
-                ),
+                borderColor: kAccent.withValues(alpha: 0.3),
+                shadowColor: kAccent.withValues(alpha: 0.1),
+                borderRadius: 18,
                 child: Row(
                   children: [
                     Container(
@@ -87,7 +82,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                         children: [
                           Text(
                             'Enter a room code',
-                            style: GoogleFonts.lora(color: kText, fontSize: 16, fontWeight: FontWeight.w600),
+                            style: AppTextStyle.cardTitle,
                           ),
                           const Gap(3),
                           const Text(
@@ -103,7 +98,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
               const Gap(28),
               Text(
                 'Room Code',
-                style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600),
+                style: AppTextStyle.sectionTitle,
               ).animate().fadeIn(delay: 100.ms),
               const Gap(10),
               Container(
@@ -118,10 +113,10 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                   textCapitalization: TextCapitalization.characters,
                   maxLength: 8,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.lora(color: kText, fontSize: 32, fontWeight: FontWeight.w800, letterSpacing: 8),
+                  style: AppTextStyle.roomCodeInput,
                   decoration: InputDecoration(
                     hintText: '· · · · · ·',
-                    hintStyle: GoogleFonts.lora(color: kBorder, fontSize: 28, letterSpacing: 8, fontWeight: FontWeight.w700),
+                    hintStyle: AppTextStyle.roomCodeHint,
                     filled: false,
                     counterText: '',
                     border: InputBorder.none,
@@ -160,7 +155,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                         )
                       : Text(
                           'Join Room',
-                          style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: kNight),
+                          style: AppTextStyle.buttonLabelDark,
                         ),
                 ),
               ).animate().fadeIn(delay: 300.ms),
