@@ -20,7 +20,10 @@ class BattleResultsView extends StatelessWidget {
         ),
         const Gap(16),
         for (var i = 0; i < results.length; i++) ...[
-          EntryCard(entry: results[i], voted: false, canVote: false, rank: i + 1),
+          KeyedSubtree(
+            key: ValueKey(results[i].id),
+            child: EntryCard(entry: results[i], voted: false, canVote: false, rank: i + 1),
+          ),
           const Gap(12),
         ],
       ],
