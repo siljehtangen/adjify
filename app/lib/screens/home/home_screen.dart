@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
 import '../../models/room.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/game_widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -109,14 +110,10 @@ class _ModeCard extends StatelessWidget {
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () => context.push('/create', extra: mode),
-        child: Container(
+        child: GameCard(
           padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: kSurface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: kBorder),
-            boxShadow: [BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 4))],
-          ),
+          borderRadius: 18,
+          shadowColor: color.withValues(alpha: 0.15),
           child: Row(
             children: [
               Container(
