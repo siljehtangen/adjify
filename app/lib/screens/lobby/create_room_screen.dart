@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
 import '../../widgets/game_widgets.dart';
@@ -57,7 +57,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
         leading: const BackButton(color: kText),
         title: Text(
           widget.mode.displayName,
-          style: GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600),
+          style: AppTextStyle.appBarTitle,
         ),
       ),
       body: Padding(
@@ -69,7 +69,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
             const Gap(28),
             Text(
               'Number of players',
-              style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600),
+              style: AppTextStyle.sectionTitle,
             ),
             const Gap(6),
             Text(_playerHint(widget.mode), style: const TextStyle(color: kTextSub, fontSize: 13)),
@@ -97,7 +97,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                     ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                     : Text(
                         'Create Room',
-                        style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
+                        style: AppTextStyle.buttonLabel,
                       ),
               ),
             ),
@@ -209,14 +209,10 @@ class _ModeInfoBanner extends StatelessWidget {
         ),
     };
 
-    return Container(
+    return GameCard(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: kSurface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 16, offset: const Offset(0, 4))],
-      ),
+      borderColor: color.withValues(alpha: 0.3),
+      shadowColor: color.withValues(alpha: 0.1),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
