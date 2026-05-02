@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 abstract final class AppTextStyle {
+  static final appBarLogo = GoogleFonts.lora(color: kAccent, fontWeight: FontWeight.w700, fontSize: 22);
   static final appBarTitle = GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600);
   static final sectionTitle = GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600);
   static final cardTitle = GoogleFonts.lora(color: kText, fontSize: 16, fontWeight: FontWeight.w600);
