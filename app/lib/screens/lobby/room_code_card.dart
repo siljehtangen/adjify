@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../widgets/game_card.dart';
 import '../../widgets/snackbars.dart';
 
@@ -25,15 +25,7 @@ class RoomCodeCard extends StatelessWidget {
             children: [
               const Text('Room Code', style: TextStyle(color: kTextSub, fontSize: 12)),
               const Gap(2),
-              Text(
-                roomCode,
-                style: GoogleFonts.lora(
-                  color: kAccent,
-                  fontSize: 30,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 4,
-                ),
-              ),
+              Text(roomCode, style: AppTextStyle.roomCode),
             ],
           ),
           const Spacer(),
