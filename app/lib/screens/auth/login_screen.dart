@@ -4,10 +4,10 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/game_widgets.dart';
 
-// Story fragments shown as faded background text
 const _kFragments = [
   (text: 'Once upon a time, a ridiculous dragon decided to...', top: 0.06, left: 0.0, rot: -1.8),
   (text: 'She was the most magnificent creature in all the...', top: 0.15, left: 0.05, rot: 1.2),
@@ -20,7 +20,6 @@ const _kFragments = [
   (text: 'The legendary cat sat on the absolutely enormous...', top: 0.91, left: 0.0, rot: -0.7),
 ];
 
-// The line that looks actively typed (positioned near the middle)
 const _kTypingLine = 'The brave yet clumsy knight grabbed his';
 
 class LoginScreen extends StatefulWidget {
@@ -103,7 +102,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
         ),
         child: Stack(
           children: [
-            _buildStoryBackground(context),
+            _StoryBackground(
+              cursorController: _cursorController,
+              typedChars: _typedChars,
+            ),
             SafeArea(
               child: Center(
                 child: Padding(
@@ -111,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      _buildLogo(),
+                      _LogoWidget(pulseController: _pulseController),
                       const Gap(28),
                       Text(
                         'Adjify',
@@ -123,9 +125,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                       ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
                       const Gap(10),
-                      _buildAnimatedSubtitle(),
+                      _AnimatedSubtitle(
+                        adjectives: _adjectives,
+                        wordIndex: _wordIndex,
+                      ),
                       const Gap(80),
-                      _buildSignInButton(),
+                      _SignInButton(loading: _loading, onSignIn: _signIn),
                     ],
                   ),
                 ),
@@ -136,18 +141,25 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       ),
     );
   }
+}
 
-  Widget _buildStoryBackground(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
+class _StoryBackground extends StatelessWidget {
+  final AnimationController cursorController;
+  final int typedChars;
+
+  const _StoryBackground({required this.cursorController, required this.typedChars});
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Positioned.fill(
       child: IgnorePointer(
         child: Stack(
           children: [
-            // Static faded story lines
             for (var i = 0; i < _kFragments.length; i++)
               Positioned(
-                top: MediaQuery.of(context).size.height * _kFragments[i].top,
-                left: w * _kFragments[i].left,
+                top: size.height * _kFragments[i].top,
+                left: size.width * _kFragments[i].left,
                 right: 0,
                 child: Transform.rotate(
                   angle: _kFragments[i].rot * 0.0174533,
@@ -164,15 +176,11 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       letterSpacing: 0.2,
                     ),
                   ),
-                )
-                    .animate()
-                    .fadeIn(delay: (400 + i * 150).ms, duration: 1200.ms),
+                ).animate().fadeIn(delay: (400 + i * 150).ms, duration: 1200.ms),
               ),
-
-            // Actively "typed" line with cursor in the middle of the screen
             Positioned(
-              top: MediaQuery.of(context).size.height * 0.44,
-              left: w * 0.02,
+              top: size.height * 0.44,
+              left: size.width * 0.02,
               right: 0,
               child: Transform.rotate(
                 angle: -0.5 * 0.0174533,
@@ -181,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      _kTypingLine.substring(0, _typedChars),
+                      _kTypingLine.substring(0, typedChars),
                       style: GoogleFonts.lora(
                         fontSize: 13,
                         color: kAccent.withValues(alpha: 0.18),
@@ -189,11 +197,10 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         letterSpacing: 0.2,
                       ),
                     ),
-                    // Blinking cursor
                     AnimatedBuilder(
-                      animation: _cursorController,
+                      animation: cursorController,
                       builder: (_, __) => Opacity(
-                        opacity: _cursorController.value > 0.5 ? 1.0 : 0.0,
+                        opacity: cursorController.value > 0.5 ? 1.0 : 0.0,
                         child: Container(
                           width: 1.5,
                           height: 13,
@@ -210,12 +217,19 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       ),
     );
   }
+}
 
-  Widget _buildLogo() {
+class _LogoWidget extends StatelessWidget {
+  final AnimationController pulseController;
+
+  const _LogoWidget({required this.pulseController});
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _pulseController,
+      animation: pulseController,
       builder: (context, child) {
-        final p = _pulseController.value;
+        final p = pulseController.value;
         return Container(
           width: 96,
           height: 96,
@@ -238,8 +252,16 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       },
     ).animate().scale(duration: 700.ms, curve: Curves.elasticOut);
   }
+}
 
-  Widget _buildAnimatedSubtitle() {
+class _AnimatedSubtitle extends StatelessWidget {
+  final List<String> adjectives;
+  final int wordIndex;
+
+  const _AnimatedSubtitle({required this.adjectives, required this.wordIndex});
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -254,8 +276,8 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             ),
           ),
           child: Text(
-            _adjectives[_wordIndex],
-            key: ValueKey(_wordIndex),
+            adjectives[wordIndex],
+            key: ValueKey(wordIndex),
             style: const TextStyle(fontSize: 16, color: kAccent, fontWeight: FontWeight.w700),
           ),
         ),
@@ -263,14 +285,22 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       ],
     ).animate().fadeIn(delay: 400.ms);
   }
+}
 
-  Widget _buildSignInButton() {
+class _SignInButton extends StatelessWidget {
+  final bool loading;
+  final VoidCallback onSignIn;
+
+  const _SignInButton({required this.loading, required this.onSignIn});
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: 58,
       child: ElevatedButton.icon(
-        onPressed: _loading ? null : _signIn,
-        icon: _loading
+        onPressed: loading ? null : onSignIn,
+        icon: loading
             ? const SizedBox(
                 width: 20,
                 height: 20,
@@ -283,15 +313,15 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                 errorBuilder: (_, __, ___) => const Icon(Icons.login, color: kNight),
               ),
         label: Text(
-          _loading ? 'Signing in…' : 'Continue with Google',
-          style: const TextStyle(color: kNight, fontWeight: FontWeight.w700, fontSize: 17),
+          loading ? 'Signing in…' : 'Continue with Google',
+          style: AppTextStyle.buttonLabelDark.copyWith(fontSize: 17),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: kAccent,
           foregroundColor: kNight,
           elevation: 14,
           shadowColor: kAccent.withValues(alpha: 0.55),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
         ),
       ),
     ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.5, end: 0);
