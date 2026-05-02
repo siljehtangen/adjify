@@ -31,12 +31,15 @@ class BattleVotingView extends StatelessWidget {
         const Gap(16),
         for (final entry in results)
           if (entry.playerId != myId) ...[
-            EntryCard(
-              entry: entry,
-              voted: votedEntryId == entry.id,
-              canVote: votedEntryId == null,
-              onVote: () => onVote(entry.id),
-            ).animate().fadeIn().slideY(begin: 0.1, end: 0),
+            KeyedSubtree(
+              key: ValueKey(entry.id),
+              child: EntryCard(
+                entry: entry,
+                voted: votedEntryId == entry.id,
+                canVote: votedEntryId == null,
+                onVote: () => onVote(entry.id),
+              ).animate().fadeIn().slideY(begin: 0.1, end: 0),
+            ),
             const Gap(12),
           ],
       ],
