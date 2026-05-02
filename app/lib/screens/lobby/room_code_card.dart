@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../config/app_colors.dart';
+import '../../widgets/game_card.dart';
 import '../../widgets/snackbars.dart';
 
 class RoomCodeCard extends StatelessWidget {
@@ -12,16 +13,11 @@ class RoomCodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GameCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
-      decoration: BoxDecoration(
-        color: kSurface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: kAccent.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(color: kAccent.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 4)),
-        ],
-      ),
+      borderColor: kAccent.withValues(alpha: 0.3),
+      shadowColor: kAccent.withValues(alpha: 0.1),
+      borderRadius: 18,
       child: Row(
         children: [
           Column(
