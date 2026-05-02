@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/app_colors.dart';
+import '../../config/app_text_styles.dart';
 import '../../models/room.dart';
 import '../../services/api_service.dart';
 import '../../services/socket_service.dart';
@@ -43,6 +43,9 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   @override
   void dispose() {
+    _socket.off(SocketEvent.playerJoined);
+    _socket.off(SocketEvent.playerLeft);
+    _socket.off(SocketEvent.gameStarted);
     _socket.leaveRoom(widget.roomCode);
     _socket.disconnect();
     super.dispose();
@@ -94,17 +97,13 @@ class _LobbyScreenState extends State<LobbyScreen> {
         leading: const BackButton(color: kText),
         title: Text(
           _room?.mode.displayName ?? 'Lobby',
-          style: GoogleFonts.lora(color: kText, fontWeight: FontWeight.w600),
+          style: AppTextStyle.appBarTitle,
         ),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kAccent))
           : _error != null
-              ? Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text(_error!, style: const TextStyle(color: kTextSub)),
-                  const Gap(12),
-                  TextButton(onPressed: _loadRoom, child: const Text('Retry', style: TextStyle(color: kAccent))),
-                ]))
+              ? ErrorRetry(error: _error!, onRetry: _loadRoom)
               : Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
@@ -150,14 +149,14 @@ class _PlayersHeader extends StatelessWidget {
       children: [
         Text(
           'Players',
-          style: GoogleFonts.lora(color: kText, fontSize: 17, fontWeight: FontWeight.w600),
+          style: AppTextStyle.sectionTitle,
         ),
         const Gap(8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
           decoration: BoxDecoration(
             color: modeColor.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.badge),
             border: Border.all(color: modeColor.withValues(alpha: 0.35)),
           ),
           child: Text(
@@ -178,13 +177,9 @@ class _PlayerTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isHost = player.role == 'host';
-    return Container(
+    return GameCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: kSurface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kBorder),
-      ),
+      borderRadius: 14,
       child: Row(
         children: [
           CircleAvatar(
@@ -217,7 +212,7 @@ class _HostBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: kGold.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.badge),
         border: Border.all(color: kGold.withValues(alpha: 0.3)),
       ),
       child: const Row(
@@ -263,7 +258,7 @@ class _LobbyFooter extends StatelessWidget {
               ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
               : Text(
                   'Start Game',
-                  style: GoogleFonts.lora(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
+                  style: AppTextStyle.buttonLabel,
                 ),
         ),
       );
