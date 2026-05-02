@@ -94,6 +94,7 @@ class _BlanksRow extends StatelessWidget {
         runSpacing: 8,
         children: story.blanks.map((blank) {
           return MouseRegion(
+            key: ValueKey(blank.id),
             cursor: blank.isFilled ? SystemMouseCursors.basic : SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () => onFillBlank(story, blank),
@@ -127,6 +128,7 @@ class _BlanksRow extends StatelessWidget {
       runSpacing: 8,
       children: story.blanks.map((blank) {
         return Container(
+          key: ValueKey(blank.id),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
             color: blank.isFilled ? kFillReveal.withValues(alpha: 0.15) : kSurface,
