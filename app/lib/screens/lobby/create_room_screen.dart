@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -39,14 +40,30 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       final room = await _api.createRoom(widget.mode, maxPlayers: _maxPlayers);
       if (mounted) context.push('/lobby/${room.code}', extra: room);
     } catch (e) {
-      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to create room');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToCreateRoom);
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
+  String _modeDisplayName(AppLocalizations l10n) => switch (widget.mode) {
+        GameMode.fillReveal => l10n.modeFillReveal,
+        GameMode.rotatingChain => l10n.modeRotatingChain,
+        GameMode.battle => l10n.modeAdjectiveBattle,
+      };
+
+  String _playerHint(AppLocalizations l10n) => switch (widget.mode) {
+        GameMode.fillReveal => l10n.fillRevealPlayerHint,
+        GameMode.rotatingChain => l10n.rotatingChainPlayerHint,
+        GameMode.battle => l10n.battlePlayerHint,
+      };
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = widget.mode.color;
 
     return Scaffold(
@@ -56,7 +73,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
         elevation: 0,
         leading: const BackButton(color: kText),
         title: Text(
-          widget.mode.displayName,
+          _modeDisplayName(l10n),
           style: AppTextStyle.appBarTitle,
         ),
       ),
@@ -65,19 +82,20 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ModeInfoBanner(mode: widget.mode, color: color),
+            _ModeInfoBanner(mode: widget.mode, color: color, l10n: l10n),
             const Gap(28),
             Text(
-              'Number of players',
+              l10n.numberOfPlayers,
               style: AppTextStyle.sectionTitle,
             ),
             const Gap(6),
-            Text(_playerHint(widget.mode), style: const TextStyle(color: kTextSub, fontSize: 13)),
+            Text(_playerHint(l10n), style: const TextStyle(color: kTextSub, fontSize: 13)),
             const Gap(16),
             _PlayerCountPicker(
               options: _options,
               selected: _maxPlayers,
               color: color,
+              soloLabel: l10n.solo,
               onSelect: (n) => setState(() => _maxPlayers = n),
             ),
             const Spacer(),
@@ -96,7 +114,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                 child: _loading
                     ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
                     : Text(
-                        'Create Room',
+                        l10n.createRoom,
                         style: AppTextStyle.buttonLabel,
                       ),
               ),
@@ -107,25 +125,20 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       ),
     );
   }
-
-  String _playerHint(GameMode mode) => switch (mode) {
-        GameMode.fillReveal => 'Solo = just you. Multiplayer = you write the story, others fill the blanks. You need at least one [ADJ] blank per other player.',
-        GameMode.rotatingChain => 'Min 2, max 6 — each player writes one step.',
-        GameMode.battle => 'Min 2, max 8 — everyone fills the same story and votes.',
-      };
-
 }
 
 class _PlayerCountPicker extends StatelessWidget {
   final List<int> options;
   final int selected;
   final Color color;
+  final String soloLabel;
   final void Function(int) onSelect;
 
   const _PlayerCountPicker({
     required this.options,
     required this.selected,
     required this.color,
+    required this.soloLabel,
     required this.onSelect,
   });
 
@@ -160,7 +173,7 @@ class _PlayerCountPicker extends StatelessWidget {
                           FaIcon(FontAwesomeIcons.user, size: 16, color: isSelected ? Colors.white : color),
                           const Gap(2),
                           Text(
-                            'Solo',
+                            soloLabel,
                             style: TextStyle(
                               color: isSelected ? Colors.white : color,
                               fontSize: 9,
@@ -189,24 +202,16 @@ class _PlayerCountPicker extends StatelessWidget {
 class _ModeInfoBanner extends StatelessWidget {
   final GameMode mode;
   final Color color;
+  final AppLocalizations l10n;
 
-  const _ModeInfoBanner({required this.mode, required this.color});
+  const _ModeInfoBanner({required this.mode, required this.color, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
     final (icon, desc) = switch (mode) {
-      GameMode.fillReveal => (
-          FontAwesomeIcons.bookOpen,
-          'Write a story with adjective blanks. Everyone fills them in — then the full story is revealed!'
-        ),
-      GameMode.rotatingChain => (
-          FontAwesomeIcons.arrowsRotate,
-          'Each player writes one part of the story in secret, passing it around the chain.'
-        ),
-      GameMode.battle => (
-          FontAwesomeIcons.trophy,
-          'All players fill the same story independently. The group votes for the funniest result!'
-        ),
+      GameMode.fillReveal => (FontAwesomeIcons.bookOpen, l10n.fillRevealBannerDesc),
+      GameMode.rotatingChain => (FontAwesomeIcons.arrowsRotate, l10n.rotatingChainBannerDesc),
+      GameMode.battle => (FontAwesomeIcons.trophy, l10n.battleBannerDesc),
     };
 
     return GameCard(
