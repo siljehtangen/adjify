@@ -1,0 +1,140 @@
+{
+  "@@locale": "en",
+
+  "signingIn": "Signing in…",
+  "continueWithGoogle": "Continue with Google",
+  "signInFailed": "Sign-in failed. Please try again.",
+  "loginSubtitlePre": "The ",
+  "loginSubtitlePost": " storytelling game",
+  "loginAdj0": "creative",
+  "loginAdj1": "hilarious",
+  "loginAdj2": "ridiculous",
+  "loginAdj3": "epic",
+  "loginAdj4": "wild",
+  "loginAdj5": "chaotic",
+  "loginAdj6": "legendary",
+
+  "chooseMode": "Choose a mode",
+  "joinFriendRoomSubtitle": "Or join a friend’s room below",
+  "modeFillReveal": "Fill & Reveal",
+  "modeFillRevealSubtitle": "Fill hidden adjective blanks — solo or with friends",
+  "fillRevealPlayerLabel": "1 – ★ blanks",
+  "modeRotatingChain": "Rotating Chain",
+  "modeRotatingChainSubtitle": "Build a chaotic story step-by-step in secret",
+  "rotatingChainPlayerLabel": "2 – 6 players",
+  "modeAdjectiveBattle": "Adjective Battle",
+  "modeBattleSubtitle": "Compete to make the funniest story from the same prompt",
+  "battlePlayerLabel": "2 – 8 players",
+  "joinARoom": "Join a Room",
+
+  "numberOfPlayers": "Number of players",
+  "solo": "Solo",
+  "createRoom": "Create Room",
+  "failedToCreateRoom": "Failed to create room",
+  "fillRevealPlayerHint": "Solo = just you. Multiplayer = you write the story, others fill the blanks. You need at least one [ADJ] blank per other player.",
+  "rotatingChainPlayerHint": "Min 2, max 6 — each player writes one step.",
+  "battlePlayerHint": "Min 2, max 8 — everyone fills the same story and votes.",
+  "fillRevealBannerDesc": "Write a story with adjective blanks. Everyone fills them in — then the full story is revealed!",
+  "rotatingChainBannerDesc": "Each player writes one part of the story in secret, passing it around the chain.",
+  "battleBannerDesc": "All players fill the same story independently. The group votes for the funniest result!",
+
+  "enterRoomCode": "Enter a room code",
+  "askHostForCode": "Ask your host for the 6-character code",
+  "roomCodeLabel": "Room Code",
+  "lettersAndNumbersOnly": "Letters and numbers only",
+  "joinRoom": "Join Room",
+  "roomNotFound": "Room not found. Check the code and try again.",
+
+  "lobby": "Lobby",
+  "players": "Players",
+  "startGame": "Start Game",
+  "waitingForHostToStart": "Waiting for host to start…",
+  "failedToLoadRoom": "Failed to load room",
+  "failedToStartGame": "Failed to start the game",
+  "hostBadge": "HOST",
+  "roomCodeCopied": "Room code copied!",
+
+  "hide": "Hide",
+  "reveal": "Reveal!",
+  "waitingForStoryWriter": "Waiting for the story writer…",
+  "hostIsWritingStory": "The host is writing a story. You’ll fill in the adjectives once it’s ready.",
+  "failedToLoadGame": "Failed to load game",
+  "storyNeedsPlaceholder": "Your story needs at least one [ADJ] placeholder",
+  "addAtLeastNBlanks": "{count, plural, one{Add at least {count} [ADJ] blank — one per player} other{Add at least {count} [ADJ] blanks — one per player}}",
+  "@addAtLeastNBlanks": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "failedToCreateStory": "Failed to create story",
+  "failedToSubmitAdjective": "Failed to submit adjective",
+
+  "writeAStory": "Write a story",
+  "soloStoryHint": "Add [ADJ] placeholders — they’ll be filled with random adjectives when you save.",
+  "multiStoryHintBase": "Use [ADJ] as placeholders for adjectives.",
+  "multiStoryHintBlanks": "{count, plural, one{You need at least {count} [ADJ] blank — one per player.} other{You need at least {count} [ADJ] blanks — one per player.}}",
+  "@multiStoryHintBlanks": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "storyExampleHint": "Example: \"The [ADJ] cat sat on a [ADJ] mat.\"",
+  "writeStoryHere": "Write your story here…",
+  "saveAndFillRandomly": "Save & Fill Randomly",
+  "saveStory": "Save Story",
+
+  "youWroteThisStory": "You wrote this story. Wait for the other players to fill in the blanks.",
+  "blanksFilled": "{filled}/{total} blanks filled",
+  "@blanksFilled": {
+    "placeholders": {
+      "filled": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "blankN": "Blank {n}",
+  "@blankN": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+
+  "waitingForYourTurn": "Waiting for your turn…",
+  "roundN": "Round {n}",
+  "@roundN": {
+    "placeholders": {
+      "n": { "type": "String" }
+    }
+  },
+  "failedToLoadTurn": "Failed to load turn",
+  "failedToSubmit": "Failed to submit",
+  "yourTurnWriteSentence": "Your turn: write a sentence",
+  "yourTurnFillAdjective": "Your turn: fill the adjective blank",
+  "includePlaceholder": "Include [ADJ] as a placeholder",
+  "whatAdjectiveFits": "What adjective fits here?",
+  "previous": "Previous:",
+  "sentenceHint": "The [ADJ] wizard walked into the [ADJ] forest…",
+  "chainAdjectiveHint": "mysterious, ancient, fluffy…",
+  "submit": "Submit",
+
+  "storySubmitted": "Story submitted!",
+  "waitingForOtherPlayers": "Waiting for other players…",
+  "failedToLoadPrompt": "Failed to load prompt",
+  "failedToSubmitEntry": "Failed to submit your entry",
+  "failedToCastVote": "Failed to cast vote",
+  "fillInAdjectives": "Fill in the adjectives",
+  "yourContinuation": "Your continuation",
+  "continueStoryHint": "Continue the story in your own words…",
+  "submitStory": "Submit Story",
+  "voteForBestStory": "Vote for the best story!",
+  "results": "🏆 Results",
+  "player": "Player",
+  "vote": "Vote",
+
+  "enterAnAdjective": "Enter an adjective",
+  "blankInputHint": "e.g. mysterious, fluffy, ancient…",
+  "confirm": "Confirm",
+
+  "retry": "Retry",
+  "goHome": "Go Home",
+  "playAgain": "Play Again"
+}
