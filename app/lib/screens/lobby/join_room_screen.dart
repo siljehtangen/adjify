@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,7 +30,10 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
       final room = await _api.joinRoom(code);
       if (mounted) context.push('/lobby/${room.code}', extra: room);
     } catch (e) {
-      if (mounted) showErrorToast(e is ApiException ? e.message : 'Room not found. Check the code and try again.');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.roomNotFound);
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -43,13 +47,14 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kBg,
         elevation: 0,
         leading: const BackButton(color: kText),
-        title: Text('Join a Room', style: AppTextStyle.appBarTitle),
+        title: Text(l10n.joinARoom, style: AppTextStyle.appBarTitle),
       ),
       body: SafeArea(
         child: Padding(
@@ -81,13 +86,13 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Enter a room code',
+                            l10n.enterRoomCode,
                             style: AppTextStyle.cardTitle,
                           ),
                           const Gap(3),
-                          const Text(
-                            'Ask your host for the 6-character code',
-                            style: TextStyle(color: kTextSub, fontSize: 13),
+                          Text(
+                            l10n.askHostForCode,
+                            style: const TextStyle(color: kTextSub, fontSize: 13),
                           ),
                         ],
                       ),
@@ -97,7 +102,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
               ).animate().fadeIn().slideX(begin: 0.06, end: 0),
               const Gap(28),
               Text(
-                'Room Code',
+                l10n.roomCodeLabel,
                 style: AppTextStyle.sectionTitle,
               ).animate().fadeIn(delay: 100.ms),
               const Gap(10),
@@ -129,7 +134,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
               const Gap(10),
               Center(
                 child: Text(
-                  'Letters and numbers only',
+                  l10n.lettersAndNumbersOnly,
                   style: TextStyle(color: kTextSub.withValues(alpha: 0.7), fontSize: 12),
                 ),
               ).animate().fadeIn(delay: 200.ms),
@@ -154,7 +159,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                           child: CircularProgressIndicator(color: kNight, strokeWidth: 2.5),
                         )
                       : Text(
-                          'Join Room',
+                          l10n.joinRoom,
                           style: AppTextStyle.buttonLabelDark,
                         ),
                 ),
