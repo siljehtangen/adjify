@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -73,7 +74,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
         });
       }
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load game'; });
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(() { _loading = false; _error = e is ApiException ? e.message : l10n.failedToLoadGame; });
+      }
     }
   }
 
@@ -89,15 +93,16 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   }
 
   Future<void> _createStory() async {
+    final l10n = AppLocalizations.of(context)!;
     final content = _storyController.text.trim();
     if (content.isEmpty || !content.contains(kAdjPlaceholder)) {
-      showErrorToast('Your story needs at least one $kAdjPlaceholder placeholder');
+      showErrorToast(l10n.storyNeedsPlaceholder);
       return;
     }
     final blankCount = kAdjPlaceholder.allMatches(content).length;
     final minBlanks = _otherPlayerCount > 0 ? _otherPlayerCount : 1;
     if (blankCount < minBlanks) {
-      showErrorToast('Add at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player');
+      showErrorToast(l10n.addAtLeastNBlanks(minBlanks));
       return;
     }
     try {
@@ -105,7 +110,7 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       _storyController.clear();
       await _load();
     } catch (e) {
-      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to create story');
+      if (mounted) showErrorToast(e is ApiException ? e.message : l10n.failedToCreateStory);
     }
   }
 
@@ -125,25 +130,29 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
       await _load();
       if (result['isComplete'] == true && mounted) setState(() => _revealed = true);
     } catch (e) {
-      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to submit adjective');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToSubmitAdjective);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kBg,
         elevation: 0,
         leading: const BackButton(color: kText),
-        title: const Text('Fill & Reveal', style: TextStyle(color: kText)),
+        title: Text(l10n.modeFillReveal, style: const TextStyle(color: kText)),
         actions: [
           if (_stories.isNotEmpty && _stories.first.isComplete)
             TextButton(
               onPressed: () => setState(() => _revealed = !_revealed),
               child: Text(
-                _revealed ? 'Hide' : 'Reveal!',
+                _revealed ? l10n.hide : l10n.reveal,
                 style: const TextStyle(color: kFillReveal, fontWeight: FontWeight.bold),
               ),
             ),
@@ -154,19 +163,19 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
           : _error != null
               ? ErrorRetry(error: _error!, onRetry: _load, accentColor: kFillReveal)
           : _stories.isEmpty
-              ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory())
+              ? (_isHost ? _buildStoryCreator() : _buildWaitingForStory(l10n))
               : _buildGameView(),
     );
   }
 
-  Widget _buildWaitingForStory() {
-    return const WaitingPlaceholder(
-      icon: Icon(Icons.edit_note, color: kFillReveal, size: 38),
-      title: 'Waiting for the story writer…',
-      subtitle: 'The host is writing a story. You\'ll fill in the adjectives once it\'s ready.',
+  Widget _buildWaitingForStory(AppLocalizations l10n) {
+    return WaitingPlaceholder(
+      icon: const Icon(Icons.edit_note, color: kFillReveal, size: 38),
+      title: l10n.waitingForStoryWriter,
+      subtitle: l10n.hostIsWritingStory,
       accent: kFillReveal,
       size: 80,
-      padding: EdgeInsets.all(32),
+      padding: const EdgeInsets.all(32),
     );
   }
 
