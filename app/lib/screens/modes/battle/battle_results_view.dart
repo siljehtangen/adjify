@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
@@ -11,12 +12,13 @@ class BattleResultsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          '🏆 Results',
-          style: TextStyle(color: kText, fontSize: 24, fontWeight: FontWeight.bold),
+        Text(
+          l10n.results,
+          style: const TextStyle(color: kText, fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const Gap(16),
         for (var i = 0; i < results.length; i++) ...[
