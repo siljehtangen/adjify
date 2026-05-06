@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
@@ -22,6 +23,7 @@ class EntryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -45,7 +47,7 @@ class EntryCard extends StatelessWidget {
                   style: const TextStyle(color: kGold, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               Text(
-                entry.username ?? 'Player',
+                entry.username ?? l10n.player,
                 style: const TextStyle(color: kText, fontWeight: FontWeight.bold),
               ),
               const Spacer(),
@@ -73,7 +75,7 @@ class EntryCard extends StatelessWidget {
             const Gap(12),
             GameSubmitButton(
               onPressed: onVote,
-              label: 'Vote',
+              label: l10n.vote,
               accent: kBattle,
               height: 40,
               elevation: 6,
