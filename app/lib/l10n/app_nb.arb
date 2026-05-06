@@ -134,6 +134,7 @@
   "blankInputHint": "f.eks. mystisk, fluffy, gammel…",
   "confirm": "Bekreft",
 
+  "pageNotFound": "Siden ble ikke funnet",
   "retry": "Prøv igjen",
   "goHome": "Gå hjem",
   "playAgain": "Spill igjen"
