@@ -1,8 +1,8 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
 import '../../../models/chain_segment.dart';
-import '../../../models/story.dart';
 import '../../../widgets/game_widgets.dart';
 
 class ChainTurnView extends StatelessWidget {
@@ -21,6 +21,7 @@ class ChainTurnView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final typeStr = turnInfo['segmentType'] as String? ?? 'sentence';
     final type = SegmentTypeX.fromString(typeStr);
     final previous = turnInfo['previousContent'] as String?;
@@ -45,11 +46,11 @@ class ChainTurnView extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isSentence ? 'Your turn: write a sentence' : 'Your turn: fill the adjective blank',
+                    isSentence ? l10n.yourTurnWriteSentence : l10n.yourTurnFillAdjective,
                     style: const TextStyle(color: kText, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    isSentence ? 'Include $kAdjPlaceholder as a placeholder' : 'What adjective fits here?',
+                    isSentence ? l10n.includePlaceholder : l10n.whatAdjectiveFits,
                     style: const TextStyle(color: kTextSub, fontSize: 12),
                   ),
                 ],
@@ -59,7 +60,7 @@ class ChainTurnView extends StatelessWidget {
         ),
         if (isSentence && previous != null) ...[
           const Gap(16),
-          const Text('Previous:', style: TextStyle(color: kTextSub, fontSize: 12)),
+          Text(l10n.previous, style: const TextStyle(color: kTextSub, fontSize: 12)),
           const Gap(4),
           Container(
             padding: const EdgeInsets.all(12),
@@ -78,15 +79,13 @@ class ChainTurnView extends StatelessWidget {
             expands: true,
             autofocus: true,
             borderRadius: 14,
-            hintText: isSentence
-                ? 'The $kAdjPlaceholder wizard walked into the $kAdjPlaceholder forest…'
-                : 'mysterious, ancient, fluffy…',
+            hintText: isSentence ? l10n.sentenceHint : l10n.chainAdjectiveHint,
           ),
         ),
         const Gap(16),
         GameSubmitButton(
           onPressed: submitting ? null : onSubmit,
-          label: 'Submit',
+          label: l10n.submit,
           loading: submitting,
           accent: kChain,
         ),
