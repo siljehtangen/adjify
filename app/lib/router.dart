@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -66,7 +67,7 @@ final router = GoRouter(
       builder: (_, state) => BattleScreen(roomCode: state.pathParameters['code']!),
     ),
   ],
-  errorBuilder: (_, state) => Scaffold(
-    body: Center(child: Text('Page not found: ${state.error}')),
+  errorBuilder: (context, _) => Scaffold(
+    body: Center(child: Text(AppLocalizations.of(context)!.pageNotFound)),
   ),
 );
