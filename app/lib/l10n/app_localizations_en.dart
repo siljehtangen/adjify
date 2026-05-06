@@ -333,6 +333,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirm => 'Confirm';
 
   @override
+  String get pageNotFound => 'Page not found';
+
+  @override
   String get retry => 'Retry';
 
   @override
