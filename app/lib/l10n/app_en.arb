@@ -134,6 +134,7 @@
   "blankInputHint": "e.g. mysterious, fluffy, ancient…",
   "confirm": "Confirm",
 
+  "pageNotFound": "Page not found",
   "retry": "Retry",
   "goHome": "Go Home",
   "playAgain": "Play Again"
