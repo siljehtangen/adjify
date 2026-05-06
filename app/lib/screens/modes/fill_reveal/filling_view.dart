@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
@@ -19,6 +20,7 @@ class FillingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -36,7 +38,7 @@ class FillingView extends StatelessWidget {
                 const Gap(10),
                 Expanded(
                   child: Text(
-                    'You wrote this story. Wait for the other players to fill in the blanks.',
+                    l10n.youWroteThisStory,
                     style: TextStyle(color: kText.withValues(alpha: 0.8), fontSize: 13),
                   ),
                 ),
@@ -49,7 +51,7 @@ class FillingView extends StatelessWidget {
         Row(
           children: [
             Text(
-              '${story.filledCount}/${story.blanks.length} blanks filled',
+              l10n.blanksFilled(story.filledCount, story.blanks.length),
               style: const TextStyle(color: kTextSub),
             ),
             const Gap(12),
@@ -67,7 +69,7 @@ class FillingView extends StatelessWidget {
           ],
         ),
         const Gap(16),
-        _BlanksRow(story: story, isHost: isHost, isSolo: isSolo, onFillBlank: onFillBlank),
+        _BlanksRow(story: story, isHost: isHost, isSolo: isSolo, onFillBlank: onFillBlank, l10n: l10n),
       ],
     );
   }
@@ -78,12 +80,14 @@ class _BlanksRow extends StatelessWidget {
   final bool isHost;
   final bool isSolo;
   final void Function(Story, StoryBlank) onFillBlank;
+  final AppLocalizations l10n;
 
   const _BlanksRow({
     required this.story,
     required this.isHost,
     required this.isSolo,
     required this.onFillBlank,
+    required this.l10n,
   });
 
   @override
@@ -110,7 +114,7 @@ class _BlanksRow extends StatelessWidget {
                       : [],
                 ),
                 child: Text(
-                  blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
+                  blank.isFilled ? blank.adjective! : l10n.blankN(blank.position + 1),
                   style: TextStyle(
                     color: blank.isFilled ? kFillReveal : kTextSub,
                     fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
@@ -138,7 +142,7 @@ class _BlanksRow extends StatelessWidget {
             ),
           ),
           child: Text(
-            blank.isFilled ? blank.adjective! : 'Blank ${blank.position + 1}',
+            blank.isFilled ? blank.adjective! : l10n.blankN(blank.position + 1),
             style: TextStyle(
               color: blank.isFilled ? kFillReveal : kTextSub.withValues(alpha: 0.4),
               fontWeight: blank.isFilled ? FontWeight.bold : FontWeight.normal,
