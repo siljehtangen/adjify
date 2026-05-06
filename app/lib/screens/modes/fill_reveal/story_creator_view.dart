@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
@@ -22,28 +23,33 @@ class StoryCreatorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final minBlanks = otherPlayerCount > 0 ? otherPlayerCount : 1;
+
+    String hintText;
+    if (isSolo) {
+      hintText = l10n.soloStoryHint;
+    } else if (otherPlayerCount > 0) {
+      hintText = '${l10n.multiStoryHintBase}\n${l10n.multiStoryHintBlanks(minBlanks)}';
+    } else {
+      hintText = '${l10n.multiStoryHintBase}\n${l10n.storyExampleHint}';
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Write a story', style: TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(l10n.writeAStory, style: const TextStyle(color: kText, fontSize: 18, fontWeight: FontWeight.bold)),
           const Gap(8),
-          Text(
-            isSolo
-                ? 'Add $kAdjPlaceholder placeholders — they\'ll be filled with random adjectives when you save.'
-                : 'Use $kAdjPlaceholder as placeholders for adjectives.\n'
-                    '${otherPlayerCount > 0 ? 'You need at least $minBlanks $kAdjPlaceholder blank${minBlanks != 1 ? 's' : ''} — one per player.' : 'Example: "The $kAdjPlaceholder cat sat on a $kAdjPlaceholder mat."'}',
-            style: const TextStyle(color: kTextSub, fontSize: 14),
-          ),
+          Text(hintText, style: const TextStyle(color: kTextSub, fontSize: 14)),
           const Gap(16),
           GameTextField(
             controller: storyController,
             minLines: 8,
             maxLines: 16,
             borderRadius: 14,
-            hintText: 'Write your story here…',
+            hintText: l10n.writeStoryHere,
           ),
           const Gap(10),
           MouseRegion(
@@ -79,7 +85,7 @@ class StoryCreatorView extends StatelessWidget {
           const Gap(12),
           GameSubmitButton(
             onPressed: onCreateStory,
-            label: isSolo ? 'Save & Fill Randomly' : 'Save Story',
+            label: isSolo ? l10n.saveAndFillRandomly : l10n.saveStory,
             accent: kFillReveal,
           ),
           const Gap(24),
