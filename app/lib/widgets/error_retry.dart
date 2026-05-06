@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../config/app_colors.dart';
@@ -16,6 +17,7 @@ class ErrorRetry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -24,7 +26,7 @@ class ErrorRetry extends StatelessWidget {
           const Gap(12),
           TextButton(
             onPressed: onRetry,
-            child: Text('Retry', style: TextStyle(color: accentColor)),
+            child: Text(l10n.retry, style: TextStyle(color: accentColor)),
           ),
         ],
       ),
