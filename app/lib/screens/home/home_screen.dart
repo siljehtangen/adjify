@@ -1,6 +1,8 @@
 import 'package:adjify/l10n/app_localizations.dart';
+import 'package:adjify/providers/locale_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
@@ -10,12 +12,14 @@ import '../../models/room.dart';
 import '../../services/auth_service.dart';
 import '../../widgets/game_widgets.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
+    final isEnglish = locale.languageCode == 'en';
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
@@ -23,6 +27,10 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: Text('Adjify', style: AppTextStyle.appBarLogo),
         actions: [
+          _LanguageToggle(isEnglish: isEnglish, onToggle: () {
+            ref.read(localeProvider.notifier).state =
+                isEnglish ? const Locale('nb') : const Locale('en');
+          }),
           IconButton(
             icon: const FaIcon(FontAwesomeIcons.rightFromBracket, size: 18, color: kTextSub),
             onPressed: () async {
@@ -184,6 +192,47 @@ class _JoinButton extends StatelessWidget {
           ),
         ),
       ).animate().fadeIn(delay: 350.ms),
+    );
+  }
+}
+
+class _LanguageToggle extends StatelessWidget {
+  final bool isEnglish;
+  final VoidCallback onToggle;
+
+  const _LanguageToggle({required this.isEnglish, required this.onToggle});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onToggle,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: kSurface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: kBorder),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              isEnglish ? '🇬🇧' : '🇳🇴',
+              style: const TextStyle(fontSize: 14),
+            ),
+            const Gap(5),
+            Text(
+              isEnglish ? 'EN' : 'NO',
+              style: const TextStyle(
+                color: kTextSub,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
