@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../config/app_colors.dart';
 import '../../../models/chain_segment.dart';
@@ -51,7 +52,10 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       final info = await _api.getChainTurn(widget.roomCode);
       if (mounted) setState(() { _turnInfo = info; _loading = false; });
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load turn'; });
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(() { _loading = false; _error = e is ApiException ? e.message : l10n.failedToLoadTurn; });
+      }
     }
   }
 
@@ -68,7 +72,8 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
       setState(() { _submitted = true; _submitting = false; });
     } catch (e) {
       if (mounted) {
-        showErrorToast(e is ApiException ? e.message : 'Failed to submit');
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToSubmit);
         setState(() => _submitting = false);
       }
     }
@@ -76,13 +81,14 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kBg,
         elevation: 0,
         leading: const BackButton(color: kText),
-        title: const Text('Rotating Chain', style: TextStyle(color: kText)),
+        title: Text(l10n.modeRotatingChain, style: const TextStyle(color: kText)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kChain))
@@ -97,19 +103,18 @@ class _RotatingChainScreenState extends State<RotatingChainScreen> {
                       submitting: _submitting,
                       onSubmit: _submit,
                     )
-                  : _buildWaiting(),
+                  : _buildWaiting(l10n),
             ),
     );
   }
 
-  Widget _buildWaiting() {
+  Widget _buildWaiting(AppLocalizations l10n) {
     return WaitingPlaceholder(
       icon: const Text('⏳', style: TextStyle(fontSize: 40)),
-      title: 'Waiting for your turn…',
-      subtitle: 'Round ${_turnInfo?['roundNumber'] ?? '?'}',
+      title: l10n.waitingForYourTurn,
+      subtitle: l10n.roundN((_turnInfo?['roundNumber'] ?? '?').toString()),
       accent: kChain,
       animate: true,
     );
   }
-
 }
