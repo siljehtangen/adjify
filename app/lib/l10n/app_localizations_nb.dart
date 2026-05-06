@@ -335,6 +335,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get confirm => 'Bekreft';
 
   @override
+  String get pageNotFound => 'Siden ble ikke funnet';
+
+  @override
   String get retry => 'Prøv igjen';
 
   @override
