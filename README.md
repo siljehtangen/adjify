@@ -19,6 +19,8 @@ A multiplayer adjective storytelling game where players collaborate or compete t
 | Backend | Node.js + TypeScript + Express + Socket.io |
 | Database & Auth | Supabase (PostgreSQL + Google OAuth) |
 | Navigation | GoRouter |
+| State management | Riverpod |
+| Localisation | flutter_localizations + intl (ARB) |
 | Env config | envied + build_runner |
 
 ## Project structure
@@ -30,7 +32,9 @@ adjify/
 │       ├── main.dart        # Entry point, Supabase init
 │       ├── router.dart      # GoRouter navigation
 │       ├── config/env.dart  # Environment variables
+│       ├── l10n/            # ARB translation files + generated code
 │       ├── models/          # Dart data models
+│       ├── providers/       # Riverpod state providers
 │       ├── screens/         # UI screens
 │       ├── services/        # API + socket clients
 │       └── widgets/         # Shared UI components
@@ -78,6 +82,22 @@ flutter pub get
 flutter pub run build_runner build
 flutter run -d edge --web-port 8080
 ```
+
+`flutter pub get` also regenerates the localisation classes from the ARB files in `app/lib/l10n/`.
+
+### Localisation
+
+The app supports **English** (`en`) and **Norwegian Bokmål** (`nb`). A language toggle is available in the home screen app bar.
+
+Translation strings live in:
+
+```
+app/lib/l10n/
+├── app_en.arb   # English (template)
+└── app_nb.arb   # Norwegian Bokmål
+```
+
+To add a new string, add the key to `app_en.arb` and its translation to `app_nb.arb`, then run `flutter pub get` to regenerate the Dart classes. To add a new language, create `app_<locale>.arb` and add the locale to `supportedLocales` in `main.dart`.
 
 ### 4. Database
 
