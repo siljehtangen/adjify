@@ -1,0 +1,140 @@
+{
+  "@@locale": "nb",
+
+  "signingIn": "Logger inn…",
+  "continueWithGoogle": "Fortsett med Google",
+  "signInFailed": "Innlogging mislyktes. Prøv igjen.",
+  "loginSubtitlePre": "Det ",
+  "loginSubtitlePost": " fortellingsspillet",
+  "loginAdj0": "kreative",
+  "loginAdj1": "morsomme",
+  "loginAdj2": "absurde",
+  "loginAdj3": "episke",
+  "loginAdj4": "ville",
+  "loginAdj5": "kaotiske",
+  "loginAdj6": "legendariske",
+
+  "chooseMode": "Velg modus",
+  "joinFriendRoomSubtitle": "Eller bli med i en venns rom nedenfor",
+  "modeFillReveal": "Fyll og Avslør",
+  "modeFillRevealSubtitle": "Fyll skjulte adjektiv-felt — alene eller med venner",
+  "fillRevealPlayerLabel": "1 – ★ felt",
+  "modeRotatingChain": "Rullerende Kjede",
+  "modeRotatingChainSubtitle": "Bygg en kaotisk historie steg for steg i hemmelighet",
+  "rotatingChainPlayerLabel": "2 – 6 spillere",
+  "modeAdjectiveBattle": "Adjektiv-kamp",
+  "modeBattleSubtitle": "Konkurrer om å lage den morsomste historien fra samme utgangspunkt",
+  "battlePlayerLabel": "2 – 8 spillere",
+  "joinARoom": "Bli med i et rom",
+
+  "numberOfPlayers": "Antall spillere",
+  "solo": "Solo",
+  "createRoom": "Opprett rom",
+  "failedToCreateRoom": "Kunne ikke opprette rommet",
+  "fillRevealPlayerHint": "Solo = bare deg. Flerspiller = du skriver historien, andre fyller feltene. Du trenger minst ett [ADJ]-felt per spiller.",
+  "rotatingChainPlayerHint": "Min 2, maks 6 — hver spiller skriver ett steg.",
+  "battlePlayerHint": "Min 2, maks 8 — alle fyller samme historie og stemmer.",
+  "fillRevealBannerDesc": "Skriv en historie med adjektiv-felt. Alle fyller dem inn — så avsløres hele historien!",
+  "rotatingChainBannerDesc": "Hver spiller skriver én del av historien i hemmelighet og sender den videre.",
+  "battleBannerDesc": "Alle spillere fyller samme historie uavhengig av hverandre. Gruppen stemmer på det morsomste resultatet!",
+
+  "enterRoomCode": "Skriv inn en romkode",
+  "askHostForCode": "Spør verten om den 6-tegns koden",
+  "roomCodeLabel": "Romkode",
+  "lettersAndNumbersOnly": "Kun bokstaver og tall",
+  "joinRoom": "Bli med i rommet",
+  "roomNotFound": "Rommet ble ikke funnet. Sjekk koden og prøv igjen.",
+
+  "lobby": "Lobby",
+  "players": "Spillere",
+  "startGame": "Start spillet",
+  "waitingForHostToStart": "Venter på at verten starter…",
+  "failedToLoadRoom": "Kunne ikke laste rommet",
+  "failedToStartGame": "Kunne ikke starte spillet",
+  "hostBadge": "VERT",
+  "roomCodeCopied": "Romkoden er kopiert!",
+
+  "hide": "Skjul",
+  "reveal": "Avslør!",
+  "waitingForStoryWriter": "Venter på historieforfatteren…",
+  "hostIsWritingStory": "Verten skriver en historie. Du fyller inn adjektivene når den er klar.",
+  "failedToLoadGame": "Kunne ikke laste spillet",
+  "storyNeedsPlaceholder": "Historien din trenger minst ett [ADJ]-felt",
+  "addAtLeastNBlanks": "{count, plural, one{Legg til minst {count} [ADJ]-felt — ett per spiller} other{Legg til minst {count} [ADJ]-felt — ett per spiller}}",
+  "@addAtLeastNBlanks": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "failedToCreateStory": "Kunne ikke opprette historien",
+  "failedToSubmitAdjective": "Kunne ikke sende inn adjektivet",
+
+  "writeAStory": "Skriv en historie",
+  "soloStoryHint": "Legg til [ADJ]-felt — de fylles med tilfeldige adjektiver når du lagrer.",
+  "multiStoryHintBase": "Bruk [ADJ] som plassholder for adjektiver.",
+  "multiStoryHintBlanks": "{count, plural, one{Du trenger minst {count} [ADJ]-felt — ett per spiller.} other{Du trenger minst {count} [ADJ]-felt — ett per spiller.}}",
+  "@multiStoryHintBlanks": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "storyExampleHint": "Eksempel: \"Den [ADJ] katten satt på en [ADJ] matte.\"",
+  "writeStoryHere": "Skriv historien din her…",
+  "saveAndFillRandomly": "Lagre og fyll tilfeldig",
+  "saveStory": "Lagre historien",
+
+  "youWroteThisStory": "Du skrev denne historien. Vent på at de andre spillerne fyller inn feltene.",
+  "blanksFilled": "{filled}/{total} felt fylt",
+  "@blanksFilled": {
+    "placeholders": {
+      "filled": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "blankN": "Felt {n}",
+  "@blankN": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+
+  "waitingForYourTurn": "Venter på din tur…",
+  "roundN": "Runde {n}",
+  "@roundN": {
+    "placeholders": {
+      "n": { "type": "String" }
+    }
+  },
+  "failedToLoadTurn": "Kunne ikke laste tur",
+  "failedToSubmit": "Kunne ikke sende inn",
+  "yourTurnWriteSentence": "Din tur: skriv en setning",
+  "yourTurnFillAdjective": "Din tur: fyll inn adjektivfeltet",
+  "includePlaceholder": "Inkluder [ADJ] som plassholder",
+  "whatAdjectiveFits": "Hvilket adjektiv passer her?",
+  "previous": "Forrige:",
+  "sentenceHint": "Den [ADJ] veiviseren gikk inn i den [ADJ] skogen…",
+  "chainAdjectiveHint": "mystisk, gammel, fluffy…",
+  "submit": "Send inn",
+
+  "storySubmitted": "Historien er sendt inn!",
+  "waitingForOtherPlayers": "Venter på de andre spillerne…",
+  "failedToLoadPrompt": "Kunne ikke laste oppgaven",
+  "failedToSubmitEntry": "Kunne ikke sende inn bidraget ditt",
+  "failedToCastVote": "Kunne ikke avgi stemme",
+  "fillInAdjectives": "Fyll inn adjektivene",
+  "yourContinuation": "Din fortsettelse",
+  "continueStoryHint": "Fortsett historien med dine egne ord…",
+  "submitStory": "Send inn historien",
+  "voteForBestStory": "Stem på den beste historien!",
+  "results": "🏆 Resultater",
+  "player": "Spiller",
+  "vote": "Stem",
+
+  "enterAnAdjective": "Skriv inn et adjektiv",
+  "blankInputHint": "f.eks. mystisk, fluffy, gammel…",
+  "confirm": "Bekreft",
+
+  "retry": "Prøv igjen",
+  "goHome": "Gå hjem",
+  "playAgain": "Spill igjen"
+}
