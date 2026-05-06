@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,6 +14,7 @@ class RoomCodeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GameCard(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       borderColor: kAccent.withValues(alpha: 0.3),
@@ -23,7 +25,7 @@ class RoomCodeCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Room Code', style: TextStyle(color: kTextSub, fontSize: 12)),
+              Text(l10n.roomCodeLabel, style: const TextStyle(color: kTextSub, fontSize: 12)),
               const Gap(2),
               Text(roomCode, style: AppTextStyle.roomCode),
             ],
@@ -34,7 +36,7 @@ class RoomCodeCard extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 Clipboard.setData(ClipboardData(text: roomCode));
-                showSuccessToast('Room code copied!');
+                showSuccessToast(l10n.roomCodeCopied);
               },
               child: Container(
                 width: 42,
