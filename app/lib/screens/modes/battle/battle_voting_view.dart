@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
@@ -21,12 +22,13 @@ class BattleVotingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'Vote for the best story!',
-          style: TextStyle(color: kText, fontSize: 20, fontWeight: FontWeight.bold),
+        Text(
+          l10n.voteForBestStory,
+          style: const TextStyle(color: kText, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const Gap(16),
         for (final entry in results)
