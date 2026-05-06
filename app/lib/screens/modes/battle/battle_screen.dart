@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../config/app_colors.dart';
@@ -69,7 +70,10 @@ class _BattleScreenState extends State<BattleScreen> {
       }
       if (mounted) setState(() { _prompt = prompt; _loading = false; });
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load prompt'; });
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(() { _loading = false; _error = e is ApiException ? e.message : l10n.failedToLoadPrompt; });
+      }
     }
   }
 
@@ -105,7 +109,8 @@ class _BattleScreenState extends State<BattleScreen> {
       if (result['allSubmitted'] == true) _loadResults();
     } catch (e) {
       if (mounted) {
-        showErrorToast(e is ApiException ? e.message : 'Failed to submit your entry');
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToSubmitEntry);
         setState(() => _submitting = false);
       }
     }
@@ -118,19 +123,23 @@ class _BattleScreenState extends State<BattleScreen> {
       setState(() => _votedEntryId = entryId);
       _loadResults();
     } catch (e) {
-      if (mounted) showErrorToast(e is ApiException ? e.message : 'Failed to cast vote');
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToCastVote);
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
         backgroundColor: kBg,
         elevation: 0,
         leading: const BackButton(color: kText),
-        title: const Text('Adjective Battle', style: TextStyle(color: kText)),
+        title: Text(l10n.modeAdjectiveBattle, style: const TextStyle(color: kText)),
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: kBattle))
@@ -144,10 +153,10 @@ class _BattleScreenState extends State<BattleScreen> {
                   submitting: _submitting,
                   onSubmit: _submit,
                 ),
-              BattlePhase.waiting => const WaitingPlaceholder(
-                  icon: Text('✅', style: TextStyle(fontSize: 40)),
-                  title: 'Story submitted!',
-                  subtitle: 'Waiting for other players…',
+              BattlePhase.waiting => WaitingPlaceholder(
+                  icon: const Text('✅', style: TextStyle(fontSize: 40)),
+                  title: l10n.storySubmitted,
+                  subtitle: l10n.waitingForOtherPlayers,
                   accent: kBattle,
                 ),
               BattlePhase.voting => BattleVotingView(
@@ -168,5 +177,4 @@ class _BattleScreenState extends State<BattleScreen> {
             },
     );
   }
-
 }
