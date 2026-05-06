@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
@@ -37,46 +39,46 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Choose a mode',
+                l10n.chooseMode,
                 style: AppTextStyle.screenHeading,
               ).animate().fadeIn(),
               const Gap(4),
-              const Text(
-                'Or join a friend\'s room below',
-                style: TextStyle(color: kTextSub, fontSize: 14),
+              Text(
+                l10n.joinFriendRoomSubtitle,
+                style: const TextStyle(color: kTextSub, fontSize: 14),
               ).animate().fadeIn(delay: 80.ms),
               const Gap(28),
-              const _ModeCard(
+              _ModeCard(
                 icon: FontAwesomeIcons.bookOpen,
-                title: 'Fill & Reveal',
-                subtitle: 'Fill hidden adjective blanks — solo or with friends',
+                title: l10n.modeFillReveal,
+                subtitle: l10n.modeFillRevealSubtitle,
                 color: kFillReveal,
                 mode: GameMode.fillReveal,
-                playerLabel: '1 – ★ blanks',
+                playerLabel: l10n.fillRevealPlayerLabel,
                 delay: 0,
               ),
               const Gap(14),
-              const _ModeCard(
+              _ModeCard(
                 icon: FontAwesomeIcons.arrowsRotate,
-                title: 'Rotating Chain',
-                subtitle: 'Build a chaotic story step-by-step in secret',
+                title: l10n.modeRotatingChain,
+                subtitle: l10n.modeRotatingChainSubtitle,
                 color: kChain,
                 mode: GameMode.rotatingChain,
-                playerLabel: '2 – 6 players',
+                playerLabel: l10n.rotatingChainPlayerLabel,
                 delay: 100,
               ),
               const Gap(14),
-              const _ModeCard(
+              _ModeCard(
                 icon: FontAwesomeIcons.trophy,
-                title: 'Adjective Battle',
-                subtitle: 'Compete to make the funniest story from the same prompt',
+                title: l10n.modeAdjectiveBattle,
+                subtitle: l10n.modeBattleSubtitle,
                 color: kBattle,
                 mode: GameMode.battle,
-                playerLabel: '2 – 8 players',
+                playerLabel: l10n.battlePlayerLabel,
                 delay: 200,
               ),
               const Spacer(),
-              const _JoinButton(),
+              _JoinButton(label: l10n.joinARoom),
             ],
           ),
         ),
@@ -160,7 +162,8 @@ class _ModeCard extends StatelessWidget {
 }
 
 class _JoinButton extends StatelessWidget {
-  const _JoinButton();
+  final String label;
+  const _JoinButton({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +175,7 @@ class _JoinButton extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: () => context.push('/join'),
           icon: const FaIcon(FontAwesomeIcons.userGroup, size: 16),
-          label: const Text('Join a Room'),
+          label: Text(label),
           style: OutlinedButton.styleFrom(
             foregroundColor: kAccent,
             side: const BorderSide(color: kAccent, width: 1.5),
