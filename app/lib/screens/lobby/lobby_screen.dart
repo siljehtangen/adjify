@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
@@ -57,7 +58,10 @@ class _LobbyScreenState extends State<LobbyScreen> {
       final room = await _api.getRoom(widget.roomCode);
       if (mounted) setState(() { _room = room; _loading = false; });
     } catch (e) {
-      if (mounted) setState(() { _loading = false; _error = e is ApiException ? e.message : 'Failed to load room'; });
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        setState(() { _loading = false; _error = e is ApiException ? e.message : l10n.failedToLoadRoom; });
+      }
     }
   }
 
@@ -68,7 +72,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
       _navigateToGame();
     } catch (e) {
       if (mounted) {
-        showErrorToast(e is ApiException ? e.message : 'Failed to start the game');
+        final l10n = AppLocalizations.of(context)!;
+        showErrorToast(e is ApiException ? e.message : l10n.failedToStartGame);
         setState(() => _starting = false);
       }
     }
@@ -87,8 +92,18 @@ class _LobbyScreenState extends State<LobbyScreen> {
 
   Color get _modeColor => _room?.mode.color ?? kAccent;
 
+  String _modeTitle(AppLocalizations l10n) {
+    if (_room == null) return l10n.lobby;
+    return switch (_room!.mode) {
+      GameMode.fillReveal => l10n.modeFillReveal,
+      GameMode.rotatingChain => l10n.modeRotatingChain,
+      GameMode.battle => l10n.modeAdjectiveBattle,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: kBg,
       appBar: AppBar(
@@ -96,7 +111,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
         elevation: 0,
         leading: const BackButton(color: kText),
         title: Text(
-          _room?.mode.displayName ?? 'Lobby',
+          _modeTitle(l10n),
           style: AppTextStyle.appBarTitle,
         ),
       ),
@@ -111,7 +126,7 @@ class _LobbyScreenState extends State<LobbyScreen> {
                     children: [
                       RoomCodeCard(roomCode: widget.roomCode),
                       const Gap(24),
-                      _PlayersHeader(room: _room, modeColor: _modeColor),
+                      _PlayersHeader(room: _room, modeColor: _modeColor, label: l10n.players),
                       const Gap(12),
                       Expanded(
                         child: ListView.separated(
@@ -120,6 +135,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                           itemBuilder: (_, i) => _PlayerTile(
                             player: _room!.players[i],
                             modeColor: _modeColor,
+                            hostBadge: l10n.hostBadge,
+                            playerFallback: l10n.player,
                           ),
                         ),
                       ),
@@ -129,6 +146,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
                         starting: _starting,
                         modeColor: _modeColor,
                         onStart: _start,
+                        startLabel: l10n.startGame,
+                        waitingLabel: l10n.waitingForHostToStart,
                       ),
                       const Gap(8),
                     ],
@@ -141,14 +160,15 @@ class _LobbyScreenState extends State<LobbyScreen> {
 class _PlayersHeader extends StatelessWidget {
   final Room? room;
   final Color modeColor;
-  const _PlayersHeader({required this.room, required this.modeColor});
+  final String label;
+  const _PlayersHeader({required this.room, required this.modeColor, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Text(
-          'Players',
+          label,
           style: AppTextStyle.sectionTitle,
         ),
         const Gap(8),
@@ -172,7 +192,14 @@ class _PlayersHeader extends StatelessWidget {
 class _PlayerTile extends StatelessWidget {
   final RoomPlayer player;
   final Color modeColor;
-  const _PlayerTile({required this.player, required this.modeColor});
+  final String hostBadge;
+  final String playerFallback;
+  const _PlayerTile({
+    required this.player,
+    required this.modeColor,
+    required this.hostBadge,
+    required this.playerFallback,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -192,11 +219,11 @@ class _PlayerTile extends StatelessWidget {
           const Gap(12),
           Expanded(
             child: Text(
-              player.username ?? 'Player',
+              player.username ?? playerFallback,
               style: const TextStyle(color: kText, fontWeight: FontWeight.w500),
             ),
           ),
-          if (isHost) const _HostBadge(),
+          if (isHost) _HostBadge(label: hostBadge),
         ],
       ),
     );
@@ -204,7 +231,8 @@ class _PlayerTile extends StatelessWidget {
 }
 
 class _HostBadge extends StatelessWidget {
-  const _HostBadge();
+  final String label;
+  const _HostBadge({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -215,12 +243,12 @@ class _HostBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.badge),
         border: Border.all(color: kGold.withValues(alpha: 0.3)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FaIcon(FontAwesomeIcons.crown, size: 10, color: kGold),
-          Gap(4),
-          Text('HOST', style: TextStyle(color: kGold, fontSize: 10, fontWeight: FontWeight.w700)),
+          const FaIcon(FontAwesomeIcons.crown, size: 10, color: kGold),
+          const Gap(4),
+          Text(label, style: const TextStyle(color: kGold, fontSize: 10, fontWeight: FontWeight.w700)),
         ],
       ),
     );
@@ -232,11 +260,15 @@ class _LobbyFooter extends StatelessWidget {
   final bool starting;
   final Color modeColor;
   final VoidCallback onStart;
+  final String startLabel;
+  final String waitingLabel;
   const _LobbyFooter({
     required this.isHost,
     required this.starting,
     required this.modeColor,
     required this.onStart,
+    required this.startLabel,
+    required this.waitingLabel,
   });
 
   @override
@@ -256,10 +288,7 @@ class _LobbyFooter extends StatelessWidget {
           ),
           child: starting
               ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
-              : Text(
-                  'Start Game',
-                  style: AppTextStyle.buttonLabel,
-                ),
+              : Text(startLabel, style: AppTextStyle.buttonLabel),
         ),
       );
     }
@@ -271,7 +300,7 @@ class _LobbyFooter extends StatelessWidget {
           const FaIcon(FontAwesomeIcons.hourglassHalf, size: 14, color: kTextSub),
           const Gap(8),
           Text(
-            'Waiting for host to start…',
+            waitingLabel,
             style: TextStyle(color: kTextSub.withValues(alpha: 0.8)),
           ),
         ],
