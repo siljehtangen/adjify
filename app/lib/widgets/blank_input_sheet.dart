@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../config/app_colors.dart';
@@ -21,6 +22,7 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).viewInsets.bottom + 24),
       decoration: BoxDecoration(
@@ -52,10 +54,10 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Blank ${widget.position + 1}',
+                    l10n.blankN(widget.position + 1),
                     style: const TextStyle(color: kText, fontSize: 17, fontWeight: FontWeight.bold),
                   ),
-                  const Text('Enter an adjective', style: TextStyle(color: kTextSub, fontSize: 13)),
+                  Text(l10n.enterAnAdjective, style: const TextStyle(color: kTextSub, fontSize: 13)),
                 ],
               ),
             ],
@@ -72,12 +74,12 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
               autofocus: true,
               textCapitalization: TextCapitalization.none,
               style: const TextStyle(color: kText, fontSize: 20),
-              decoration: const InputDecoration(
-                hintText: 'e.g. mysterious, fluffy, ancient…',
-                hintStyle: TextStyle(color: kTextSub),
+              decoration: InputDecoration(
+                hintText: l10n.blankInputHint,
+                hintStyle: const TextStyle(color: kTextSub),
                 filled: false,
                 border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               onSubmitted: (val) => Navigator.of(context).pop(val.trim()),
             ),
@@ -94,7 +96,7 @@ class _BlankInputSheetState extends State<BlankInputSheet> {
                 shadowColor: kFillReveal.withValues(alpha: 0.4),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
-              child: const Text('Confirm', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              child: Text(l10n.confirm, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
             ),
           ),
         ],
