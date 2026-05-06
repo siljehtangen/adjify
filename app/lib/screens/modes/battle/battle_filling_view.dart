@@ -1,3 +1,4 @@
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import '../../../config/app_colors.dart';
@@ -21,6 +22,7 @@ class BattleFillingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final blankCount = adjectives.length;
 
     return SingleChildScrollView(
@@ -28,24 +30,24 @@ class BattleFillingView extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Fill in the adjectives', style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(l10n.fillInAdjectives, style: const TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(12),
           for (var i = 0; i < blankCount; i++) ...[
-            GameTextField(controller: adjectives[i]!, labelText: 'Blank ${i + 1}'),
+            GameTextField(controller: adjectives[i]!, labelText: l10n.blankN(i + 1)),
             const Gap(8),
           ],
           const Gap(16),
-          const Text('Your continuation', style: TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(l10n.yourContinuation, style: const TextStyle(color: kText, fontSize: 16, fontWeight: FontWeight.bold)),
           const Gap(8),
           GameTextField(
             controller: continuationController,
             maxLines: 4,
-            hintText: 'Continue the story in your own words…',
+            hintText: l10n.continueStoryHint,
           ),
           const Gap(20),
           GameSubmitButton(
             onPressed: submitting ? null : onSubmit,
-            label: 'Submit Story',
+            label: l10n.submitStory,
             loading: submitting,
             accent: kBattle,
           ),
