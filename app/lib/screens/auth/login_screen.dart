@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:adjify/l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,7 @@ const _kFragments = [
 ];
 
 const _kTypingLine = 'The brave yet clumsy knight grabbed his';
+const _kAdjectiveCount = 7;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -38,8 +40,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
   late AnimationController _typingController;
 
   int _typedChars = 0;
-
-  final List<String> _adjectives = ['creative', 'hilarious', 'ridiculous', 'epic', 'wild', 'chaotic', 'legendary'];
   int _wordIndex = 0;
 
   @override
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     while (mounted) {
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted) break;
-      setState(() => _wordIndex = (_wordIndex + 1) % _adjectives.length);
+      setState(() => _wordIndex = (_wordIndex + 1) % _kAdjectiveCount);
     }
   }
 
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     try {
       await _auth.signInWithGoogle();
     } catch (e) {
-      if (mounted) showErrorToast('Sign-in failed. Please try again.');
+      if (mounted) showErrorToast(AppLocalizations.of(context)!.signInFailed);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -125,10 +125,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         ),
                       ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
                       const Gap(10),
-                      _AnimatedSubtitle(
-                        adjectives: _adjectives,
-                        wordIndex: _wordIndex,
-                      ),
+                      _AnimatedSubtitle(wordIndex: _wordIndex),
                       const Gap(80),
                       _SignInButton(loading: _loading, onSignIn: _signIn),
                     ],
@@ -255,17 +252,21 @@ class _LogoWidget extends StatelessWidget {
 }
 
 class _AnimatedSubtitle extends StatelessWidget {
-  final List<String> adjectives;
   final int wordIndex;
 
-  const _AnimatedSubtitle({required this.adjectives, required this.wordIndex});
+  const _AnimatedSubtitle({required this.wordIndex});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final adjectives = [
+      l10n.loginAdj0, l10n.loginAdj1, l10n.loginAdj2, l10n.loginAdj3,
+      l10n.loginAdj4, l10n.loginAdj5, l10n.loginAdj6,
+    ];
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('The ', style: TextStyle(fontSize: 16, color: kTextSub.withValues(alpha: 0.9))),
+        Text(l10n.loginSubtitlePre, style: TextStyle(fontSize: 16, color: kTextSub.withValues(alpha: 0.9))),
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),
           transitionBuilder: (child, animation) => FadeTransition(
@@ -281,7 +282,7 @@ class _AnimatedSubtitle extends StatelessWidget {
             style: const TextStyle(fontSize: 16, color: kAccent, fontWeight: FontWeight.w700),
           ),
         ),
-        Text(' storytelling game', style: TextStyle(fontSize: 16, color: kTextSub.withValues(alpha: 0.9))),
+        Text(l10n.loginSubtitlePost, style: TextStyle(fontSize: 16, color: kTextSub.withValues(alpha: 0.9))),
       ],
     ).animate().fadeIn(delay: 400.ms);
   }
@@ -295,6 +296,7 @@ class _SignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 58,
@@ -313,7 +315,7 @@ class _SignInButton extends StatelessWidget {
                 errorBuilder: (_, __, ___) => const Icon(Icons.login, color: kNight),
               ),
         label: Text(
-          loading ? 'Signing in…' : 'Continue with Google',
+          loading ? l10n.signingIn : l10n.continueWithGoogle,
           style: AppTextStyle.buttonLabelDark.copyWith(fontSize: 17),
         ),
         style: ElevatedButton.styleFrom(
