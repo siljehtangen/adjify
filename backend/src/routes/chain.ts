@@ -30,7 +30,7 @@ router.get('/turn', authenticate, async (req: AuthRequest, res: Response) => {
     const room = await getRoomByCode(req.params.code);
     const last = await getLastSegment(room.id);
     const playerIds = await getPlayerListForRoom(room.id);
-    const nextPlayerId = getNextPlayer(playerIds, last?.author_id ?? null, last?.round_number ?? 0);
+    const nextPlayerId = getNextPlayer(playerIds, last?.author_id ?? null);
     const nextType = last?.segment_type === 'sentence' ? 'blank_fill' : 'sentence';
 
     return res.json({
@@ -60,7 +60,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     // Verify it's the requester's turn
     const last = await getLastSegment(room.id);
-    const expected = getNextPlayer(playerIds, last?.author_id ?? null, last?.round_number ?? 0);
+    const expected = getNextPlayer(playerIds, last?.author_id ?? null);
 
     if (expected !== req.user!.id) {
       return res.status(403).json({ error: 'Not your turn' });
