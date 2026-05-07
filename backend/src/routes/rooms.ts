@@ -19,7 +19,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
   try {
     const room = await createRoom(req.user!.id, parsed.data.mode, parsed.data.maxPlayers);
     return res.status(201).json(room);
-  } catch (err: any) {
+  } catch (err) {
     console.error('[POST /api/rooms]', err);
     return routeError(res, err, 500);
   }
@@ -38,7 +38,7 @@ router.post('/:code/join', authenticate, async (req: AuthRequest, res: Response)
   try {
     const room = await joinRoom(req.params.code, req.user!.id);
     return res.json(room);
-  } catch (err: any) {
+  } catch (err) {
     console.error('[POST /api/rooms/:code/join]', err);
     return routeError(res, err);
   }
@@ -49,7 +49,7 @@ router.post('/:code/leave', authenticate, async (req: AuthRequest, res: Response
     const room = await getRoomByCode(req.params.code);
     await leaveRoom(room.id, req.user!.id);
     return res.json({ success: true });
-  } catch (err: any) {
+  } catch (err) {
     console.error('[POST /api/rooms/:code/leave]', err);
     return routeError(res, err);
   }
@@ -61,7 +61,7 @@ router.post('/:code/start', authenticate, async (req: AuthRequest, res: Response
     const updated = await startGame(room.id, req.user!.id);
     emitToRoom(req.io, req.params.code, 'room:game_started', updated);
     return res.json(updated);
-  } catch (err: any) {
+  } catch (err) {
     console.error('[POST /api/rooms/:code/start]', err);
     return routeError(res, err);
   }
