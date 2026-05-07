@@ -81,7 +81,9 @@ class _BattleScreenState extends State<BattleScreen> {
     try {
       final results = await _api.getBattleResults(widget.roomCode);
       if (mounted) setState(() => _results = results);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('[BattleScreen] failed to load results: $e');
+    }
   }
 
   Future<void> _submit() async {
