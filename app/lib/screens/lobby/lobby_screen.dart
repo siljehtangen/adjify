@@ -69,7 +69,8 @@ class _LobbyScreenState extends State<LobbyScreen> {
     setState(() => _starting = true);
     try {
       await _api.startGame(widget.roomCode);
-      _navigateToGame();
+      // Navigation happens via the gameStarted socket event (emitted to all room members
+      // including the host), so we don't navigate here to avoid a double-navigation.
     } catch (e) {
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
