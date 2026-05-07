@@ -63,8 +63,10 @@ class _FillRevealScreenState extends State<FillRevealScreen> {
   Future<void> _load() async {
     if (mounted) setState(() => _error = null);
     try {
-      final room = await _api.getRoom(widget.roomCode);
-      final stories = await _api.getStories(widget.roomCode);
+      final (room, stories) = await (
+        _api.getRoom(widget.roomCode),
+        _api.getStories(widget.roomCode),
+      ).wait;
       if (mounted) {
         setState(() {
           _hostId = room.hostId;
