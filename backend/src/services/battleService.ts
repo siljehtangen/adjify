@@ -84,18 +84,15 @@ export async function getResults(roomId: string) {
 }
 
 export async function allPlayersSubmitted(roomId: string): Promise<boolean> {
-  const { data: players } = await supabase
-    .from('room_players')
-    .select('player_id')
-    .eq('room_id', roomId);
+  const [{ data: players, error: playersError }, { data: entries, error: entriesError }] =
+    await Promise.all([
+      supabase.from('room_players').select('player_id').eq('room_id', roomId),
+      supabase.from('battle_entries').select('player_id, submitted_at').eq('room_id', roomId),
+    ]);
 
-  const { data: entries } = await supabase
-    .from('battle_entries')
-    .select('player_id, submitted_at')
-    .eq('room_id', roomId);
+  if (playersError) throw playersError;
+  if (entriesError) throw entriesError;
 
-  if (!players || !entries) return false;
-
-  const submittedIds = new Set(entries.filter((e) => e.submitted_at).map((e) => e.player_id));
-  return players.every((p) => submittedIds.has(p.player_id));
+  const submittedIds = new Set(entries!.filter((e) => e.submitted_at).map((e) => e.player_id));
+  return players!.every((p) => submittedIds.has(p.player_id));
 }
