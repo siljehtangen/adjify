@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { z } from 'zod';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
-import { getRoomByCode } from '../services/roomService.js';
+import { getRoomByCode, isRoomMember } from '../services/roomService.js';
 import { countBlanks, createStory, fillBlank, getStoryWithBlanks } from '../services/storyService.js';
 import { supabase } from '../config/supabase.js';
 import { routeError } from '../utils/routeError.js';
@@ -39,7 +39,7 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response) => {
     const story = await createStory(room.id, parsed.data.content, req.user!.id);
     emitToRoom(req.io, req.params.code, 'game:story_created', {});
     return res.status(201).json(story);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
@@ -56,7 +56,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
 
     if (error) throw error;
     return res.json(data);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
@@ -68,8 +68,7 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
 
   try {
     const room = await getRoomByCode(req.params.code);
-    const isMember = room.room_players.some((p: { player_id: string }) => p.player_id === req.user!.id);
-    if (!isMember) return res.status(403).json({ error: 'Not a member of this room' });
+    if (!isRoomMember(room, req.user!.id)) return res.status(403).json({ error: 'Not a member of this room' });
 
     const story = await getStoryWithBlanks(req.params.storyId);
     const isSolo = room.room_players.length === 1;
@@ -106,7 +105,7 @@ router.post('/:storyId/blanks', authenticate, async (req: AuthRequest, res: Resp
       emitToRoom(req.io, req.params.code, 'game:story_revealed', {});
     }
     return res.json(result);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
@@ -120,7 +119,7 @@ router.get('/:storyId/reveal', authenticate, async (req: AuthRequest, res: Respo
       return res.status(403).json({ error: 'Story is not fully filled yet' });
     }
     return res.json(story);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
