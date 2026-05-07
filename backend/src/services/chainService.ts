@@ -52,11 +52,7 @@ export async function addChainSegment(
   return data as ChainSegment;
 }
 
-/**
- * Determine whose turn it is next based on player list and round number.
- * Players rotate in order; the previous author cannot go twice in a row.
- */
-export function getNextPlayer(playerIds: string[], lastAuthorId: string | null, roundNumber: number): string {
+export function getNextPlayer(playerIds: string[], lastAuthorId: string | null): string {
   if (!lastAuthorId) return playerIds[0];
   const idx = playerIds.indexOf(lastAuthorId);
   return playerIds[(idx + 1) % playerIds.length];
