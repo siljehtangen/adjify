@@ -99,6 +99,13 @@ export async function leaveRoom(roomId: string, playerId: string) {
   if (error) throw error;
 }
 
+export function isRoomMember(
+  room: { room_players: { player_id: string }[] },
+  playerId: string
+): boolean {
+  return room.room_players.some(p => p.player_id === playerId);
+}
+
 export async function getPlayerListForRoom(roomId: string): Promise<string[]> {
   const { data: players } = await supabase
     .from('room_players')
