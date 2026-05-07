@@ -19,7 +19,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response) => {
     const room = await getRoomByCode(req.params.code);
     const segments = await getChainSegments(room.id);
     return res.json(segments);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
@@ -40,7 +40,7 @@ router.get('/turn', authenticate, async (req: AuthRequest, res: Response) => {
       isYourTurn: nextPlayerId === req.user!.id,
       previousContent: last?.segment_type === 'sentence' ? last.content : undefined,
     });
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
@@ -75,7 +75,7 @@ router.post('/submit', authenticate, async (req: AuthRequest, res: Response) => 
 
     emitToRoom(req.io, req.params.code, 'game:chain_submitted', { segment });
     return res.status(201).json(segment);
-  } catch (err: any) {
+  } catch (err) {
     return routeError(res, err);
   }
 });
