@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:adjify/l10n/app_localizations.dart';
@@ -22,7 +23,6 @@ const _kFragments = [
 ];
 
 const _kTypingLine = 'The brave yet clumsy knight grabbed his';
-const _kAdjectiveCount = 7;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -66,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     while (mounted) {
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted) break;
-      setState(() => _wordIndex = (_wordIndex + 1) % _kAdjectiveCount);
+      setState(() => _wordIndex++);
     }
   }
 
@@ -159,7 +159,7 @@ class _StoryBackground extends StatelessWidget {
                 left: size.width * _kFragments[i].left,
                 right: 0,
                 child: Transform.rotate(
-                  angle: _kFragments[i].rot * 0.0174533,
+                  angle: _kFragments[i].rot * math.pi / 180,
                   alignment: Alignment.centerLeft,
                   child: Text(
                     _kFragments[i].text,
@@ -180,7 +180,7 @@ class _StoryBackground extends StatelessWidget {
               left: size.width * 0.02,
               right: 0,
               child: Transform.rotate(
-                angle: -0.5 * 0.0174533,
+                angle: -0.5 * math.pi / 180,
                 alignment: Alignment.centerLeft,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -277,8 +277,8 @@ class _AnimatedSubtitle extends StatelessWidget {
             ),
           ),
           child: Text(
-            adjectives[wordIndex],
-            key: ValueKey(wordIndex),
+            adjectives[wordIndex % adjectives.length],
+            key: ValueKey(wordIndex % adjectives.length),
             style: const TextStyle(fontSize: 16, color: kAccent, fontWeight: FontWeight.w700),
           ),
         ),
